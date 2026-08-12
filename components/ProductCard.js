@@ -3,7 +3,7 @@
 import React from 'react';
 import { Tag, Shield } from 'lucide-react';
 
-export default function ProductCard({ product, whatsappNumber = '918340282773' }) {
+export default function ProductCard({ product, whatsappNumber = '918986043632' }) {
   const { name, brand, category, description, price, imageUrl, specifications } = product;
 
   // Build dynamic pre-filled WhatsApp message
@@ -22,15 +22,15 @@ Please share the current pricing. Thank you!`;
   };
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/60 transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xl dark:hover:shadow-2xl hover:shadow-slate-300/35 dark:hover:shadow-blue-900/20">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:border-slate-350 dark:hover:border-slate-700 hover:shadow-xl dark:hover:shadow-blue-900/20">
       
       {/* Brand & Category Badges */}
       <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-2">
-        <span className="flex items-center gap-1 rounded-full bg-blue-50/95 dark:bg-blue-950/80 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 backdrop-blur-md border border-blue-200/60 dark:border-blue-800/50">
+        <span className="flex items-center gap-1 rounded-full bg-blue-50/95 dark:bg-blue-950/80 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 backdrop-blur-md border border-blue-200/50 dark:border-blue-800/50">
           <Shield size={12} />
           {brand}
         </span>
-        <span className="flex items-center gap-1 rounded-full bg-slate-100/95 dark:bg-slate-950/80 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 backdrop-blur-md border border-slate-200 dark:border-slate-850/50">
+        <span className="flex items-center gap-1 rounded-full bg-slate-105/95 dark:bg-slate-950/80 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 backdrop-blur-md border border-slate-200 dark:border-slate-850/50">
           <Tag size={12} />
           {category}
         </span>
@@ -78,7 +78,7 @@ Please share the current pricing. Thank you!`;
         </h3>
         
         {description && (
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+          <p className="mt-2 text-sm text-slate-550 dark:text-slate-400 line-clamp-2">
             {description}
           </p>
         )}
@@ -88,7 +88,7 @@ Please share the current pricing. Thank you!`;
           <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-slate-200 dark:border-slate-800/80 pt-3">
             {specifications.slice(0, 3).map((spec, index) => (
               <div key={index} className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                <span className="font-semibold text-slate-400 dark:text-slate-500">{spec.key}:</span>
+                <span className="font-semibold text-slate-400 dark:text-slate-550">{spec.key}:</span>
                 <span className="text-slate-700 dark:text-slate-300">{spec.value}</span>
               </div>
             ))}
@@ -98,20 +98,20 @@ Please share the current pricing. Thank you!`;
         {/* Price Row */}
         <div className="mt-auto pt-5">
           <div className="flex items-baseline justify-between mb-4">
-            <span className="text-xs font-medium text-slate-400 dark:text-slate-550 uppercase tracking-wider">Estimated Price</span>
+            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estimated Price</span>
             <span className="text-lg font-extrabold text-blue-600 dark:text-blue-400">{price}</span>
           </div>
 
-          {/* WhatsApp CTA Button */}
+          {/* Normal Solid WhatsApp CTA Button */}
           <a
             href={getWhatsAppLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white transition-all duration-355 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-600/20 dark:hover:shadow-emerald-900/35 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-605/20 dark:hover:shadow-emerald-900/30 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
           >
-            {/* WhatsApp Custom SVG Icon for perfect branding */}
+            {/* WhatsApp Icon */}
             <svg
-              className="h-5 w-5 fill-current"
+              className="h-5 w-5 fill-current shrink-0"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
             >

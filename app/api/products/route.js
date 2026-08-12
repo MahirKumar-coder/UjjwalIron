@@ -12,6 +12,13 @@ function isAuthenticated(request) {
 // GET /api/products - Get all products (active & inactive)
 export async function GET(request) {
   try {
+    if (!isAuthenticated(request)) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Invalid admin password.' },
+        { status: 401 }
+      );
+    }
+
     await dbConnect();
     const products = await Product.find({}).sort({ updatedAt: -1 });
     return NextResponse.json({ success: true, data: products }, { status: 200 });

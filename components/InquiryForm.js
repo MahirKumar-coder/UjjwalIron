@@ -49,7 +49,7 @@ export default function InquiryForm() {
         });
 
         // Trigger WhatsApp Redirect with form data
-        const whatsappNumber = '918340282773';
+        const whatsappNumber = '918986043632';
         const text = `Hi Ujjwal Iron, I have submitted a website inquiry:
 - *Name:* ${formData.name}
 - *Phone:* ${formData.phone}

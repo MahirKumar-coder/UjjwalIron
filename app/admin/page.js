@@ -481,7 +481,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             {/* Filters Controls */}
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-8">
               <div className="sm:col-span-8 relative">
-                <Search className="absolute left-4.5 top-3.5 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Search product name or brand..."
@@ -588,7 +588,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             {/* Filter and controls */}
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-8">
               <div className="sm:col-span-8 relative">
-                <Search className="absolute left-4.5 top-3.5 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Search customer name, phone, or requirements..."

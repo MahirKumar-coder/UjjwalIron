@@ -15,8 +15,8 @@ import {
 } from 'lucide-react';
 
 export default function Home() {
-  const whatsappNumber = '918340282773';
-  const phoneNumber = '+918340282773';
+  const whatsappNumber = '918986043632';
+  const phoneNumber = '+918986043632';
   
   const heroWhatsAppText = encodeURIComponent(
     'Hi Ujjwal Iron, I am visiting your website and want to inquire about steel product rates.'

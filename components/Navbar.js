@@ -2,13 +2,30 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Phone, Menu, X, Sun, Moon } from 'lucide-react';
 
-export default function Navbar({ phone = '+918340282773' }) {
+export default function Navbar({ phone = '+918986043632' }) {
   const [isOpen, setIsOpen] = useState(false);
   const [theme, setTheme] = useState('dark');
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Handle double-click logo to navigate to Admin
+  let clickTimeout = null;
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    if (clickTimeout !== null) {
+      clearTimeout(clickTimeout);
+      clickTimeout = null;
+      router.push('/admin');
+    } else {
+      clickTimeout = setTimeout(() => {
+        clickTimeout = null;
+        router.push('/');
+      }, 250);
+    }
+  };
 
   // Handle initial theme configuration
   useEffect(() => {
@@ -47,14 +64,14 @@ export default function Navbar({ phone = '+918340282773' }) {
           
           {/* Logo / Brand Name */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2 group">
+            <a href="/" onClick={handleLogoClick} className="flex items-center gap-2 group select-none">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 font-black text-white shadow-lg shadow-blue-500/25 transition-transform group-hover:scale-105">
                 UI
               </div>
               <span className="text-xl font-black tracking-wider text-slate-900 dark:text-white">
                 UJJWAL <span className="text-blue-500">IRON</span>
               </span>
-            </Link>
+            </a>
           </div>
 
           {/* Desktop Navigation Links */}

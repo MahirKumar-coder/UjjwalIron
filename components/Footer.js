@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Phone, Mail, MapPin, CheckCircle2 } from 'lucide-react';
 
 export default function Footer({
-  phone = '+918340282773',
+  phone = '+918986043632',
   email = 'sales@ujjwaliron.com',
   gstin = '10AIAPR5590E1ZJ',
   address = 'H/o Lalmati Devi, Ashiyana Digha Road, Digha Ghat, Patna, Bihar 800011',
