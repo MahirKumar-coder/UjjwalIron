@@ -49,6 +49,43 @@ export default function AdminPage() {
     isActive: true,
   });
 
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image is too large. Max size allowed is 5MB.");
+      return;
+    }
+
+    setUploading(true);
+    const uData = new FormData();
+    uData.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'x-admin-password': passcode,
+        },
+        body: uData,
+      });
+
+      const result = await res.json();
+      if (res.ok && result.success) {
+        setFormData((prev) => ({ ...prev, imageUrl: result.url }));
+      } else {
+        alert(result.error || 'Failed to upload image.');
+      }
+    } catch (err) {
+      alert('A network error occurred during image upload.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   // Local storage check for passcode
   useEffect(() => {
     const savedPass = sessionStorage.getItem('admin_pass');
@@ -806,19 +843,72 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   </div>
                 </div>
 
-                {/* Image URL */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1.5">
-                    Image URL
+                {/* Image Upload & URL Override */}
+                <div className="space-y-3">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1">
+                    Product Image
                   </label>
-                  <input
-                    type="text"
-                    name="imageUrl"
-                    value={formData.imageUrl}
-                    onChange={handleFormChange}
-                    placeholder="e.g. /images/products/tmt.jpg or leave blank for placeholder"
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
-                  />
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+                      {formData.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={formData.imageUrl}
+                          alt="Product Preview"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-3xs text-slate-400 dark:text-slate-500 font-semibold text-center px-1">No Image</div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 w-full space-y-2">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <input
+                          type="file"
+                          id="admin-image-upload"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          disabled={uploading}
+                        />
+                        <label
+                          htmlFor="admin-image-upload"
+                          className={`inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-blue-500 cursor-pointer select-none transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
+                        >
+                          {uploading ? 'Uploading...' : 'Upload Image File'}
+                        </label>
+                        {formData.imageUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
+                            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-xs font-bold text-rose-600 hover:text-rose-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                          >
+                            Remove Image
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-3xs text-slate-450 dark:text-slate-500">
+                        Supports PNG, JPG, JPEG, WEBP. Max 5MB.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Fallback Manual URL Input (for flexibility) */}
+                  <div className="pt-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
+                      Or Paste Image Link manually
+                    </label>
+                    <input
+                      type="text"
+                      name="imageUrl"
+                      value={formData.imageUrl}
+                      onChange={handleFormChange}
+                      placeholder="e.g. /images/products/tmt.jpg"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
                 </div>
 
                 {/* Description */}

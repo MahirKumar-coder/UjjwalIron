@@ -32,11 +32,10 @@ export default function InquiryForm() {
     }
 
     try {
-      const response = await fetch('/api/inquiries', {
+      // Step 1: Call Backend API to send Email
+      const response = await fetch('/api/send-inquiry', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
@@ -45,32 +44,36 @@ export default function InquiryForm() {
       if (response.ok && result.success) {
         setStatus({
           success: true,
-          message: 'Thank you! Your inquiry has been submitted. We are redirecting you to WhatsApp, or our sales team will call you shortly.',
+          message: 'Inquiry submitted! Redirecting to WhatsApp...',
         });
 
-        // Trigger WhatsApp Redirect with form data
-        const whatsappNumber = '918986043632';
-        const text = `Hi Ujjwal Iron, I have submitted a website inquiry:
+        // Step 2: Trigger WhatsApp Redirect (Owner ka number yahan daalo)
+        const ownerWhatsAppNumber = '918986043632'; // Make sure 91 is prepended
+        const text = `Hi Ujjwal Iron, I have a new inquiry:
 - *Name:* ${formData.name}
 - *Phone:* ${formData.phone}
 ${formData.productNeeded ? `- *Product Needed:* ${formData.productNeeded}` : ''}
-${formData.message ? `- *Details:* ${formData.message}` : ''}
-Please contact me. Thank you!`;
+${formData.message ? `- *Details:* ${formData.message}` : ''}`;
         
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
-        window.open(whatsappUrl, '_blank');
+        const whatsappUrl = `https://wa.me/${ownerWhatsAppNumber}?text=${encodeURIComponent(text)}`;
+        
+        // Open WhatsApp in new tab
+        setTimeout(() => {
+            window.open(whatsappUrl, '_blank');
+        }, 1500); // 1.5 second delay so they can read the success message
 
+        // Clear form
         setFormData({ name: '', phone: '', productNeeded: '', message: '' });
       } else {
         setStatus({
           success: false,
-          message: result.error || 'Something went wrong. Please try again.',
+          message: result.error || 'Failed to send inquiry. Please try again.',
         });
       }
     } catch (error) {
       setStatus({
         success: false,
-        message: 'Network error. Please check your internet connection and try again.',
+        message: 'Network error. Please check your internet connection.',
       });
     } finally {
       setLoading(false);
