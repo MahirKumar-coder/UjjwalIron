@@ -14,9 +14,50 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Ujjwal Iron",
+    "image": "https://ujjwaliron.com/images/hero_steel_yard.jpg",
+    "telephone": "+918986043632",
+    "email": "sales@ujjwaliron.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "H/o Lalmati Devi, Ashiyana Digha Road, Digha Ghat",
+      "addressLocality": "Patna",
+      "addressRegion": "Bihar",
+      "postalCode": "800011",
+      "addressCountry": "IN"
+    },
+    "url": "https://ujjwaliron.com",
+    "priceRange": "₹₹",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "opens": "09:00",
+        "closes": "19:00"
+      }
+    ],
+    "sameAs": [
+      "https://wa.me/918986043632"
+    ]
+  };
+
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />
