@@ -64,10 +64,13 @@ export default function Navbar({ phone = '+918986043632' }) {
           
           {/* Logo / Brand Name */}
           <div className="flex items-center">
-            <a href="/" onClick={handleLogoClick} className="flex items-center gap-2 group select-none">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 font-black text-white shadow-lg shadow-blue-500/25 transition-transform group-hover:scale-105">
-                UI
-              </div>
+            <a href="/" onClick={handleLogoClick} className="flex items-center gap-2.5 group select-none">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo.jpg"
+                alt="Ujjwal Iron Logo"
+                className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-800 object-cover shadow-md shadow-slate-900/10 transition-transform group-hover:scale-105"
+              />
               <span className="text-xl font-black tracking-wider text-slate-900 dark:text-white">
                 UJJWAL <span className="text-blue-500">IRON</span>
               </span>

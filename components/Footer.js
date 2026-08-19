@@ -18,10 +18,13 @@ export default function Footer({
           
           {/* Brand Info */}
           <div className="flex flex-col gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-600 font-black text-white">
-                UI
-              </div>
+            <Link href="/" className="flex items-center gap-2.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo.jpg"
+                alt="Ujjwal Iron Logo"
+                className="h-8 w-8 rounded-full border border-slate-200 dark:border-slate-800 object-cover shadow-sm"
+              />
               <span className="text-lg font-black tracking-wider text-slate-900 dark:text-white">
                 UJJWAL <span className="text-blue-500">IRON</span>
               </span>
