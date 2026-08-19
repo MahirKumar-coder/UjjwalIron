@@ -40,12 +40,12 @@ export default function Home() {
       href: '/products?category=Roofing+Sheets'
     },
     {
-      title: 'TMT Reinforcement Bars',
-      desc: 'High-strength thermo-mechanically treated rebars for residential and commercial concrete reinforcement.',
-      brands: 'Tata Tiscon, SAIL, SRMB',
+      title: 'MS Angle & MS Flat',
+      desc: 'Top quality Mild Steel structural Angles and flat iron bars for structural fabrication, grids, and frames.',
+      brands: 'SAIL, VIZAG Steel, local high-grade mills',
       icon: <Settings className="h-5 w-5 text-blue-655 dark:text-blue-500" />,
-      imageUrl: '/images/cat_tmt_bars.jpg',
-      href: '/products?category=TMT+Bars'
+      imageUrl: '/images/cat_ms_angle_flat.jpg',
+      href: '/products?category=MS+Angle+%26+MS+Flat'
     },
     {
       title: 'Structural Steel',
@@ -114,7 +114,7 @@ export default function Home() {
 
               {/* Description */}
               <p className="mt-6 max-w-lg text-lg text-slate-650 dark:text-slate-400 sm:text-xl">
-                Authorized dealers of Tata Structura, Jindal Star, and SAIL. We supply high-grade MS Pipes, Roofing Sheets, and TMT Bars with fast, direct-to-site delivery.
+                Authorized dealers of Tata Structura, Jindal Star, and SAIL. We supply high-grade MS Pipes, Roofing Sheets, and MS Angles & Flats with fast, direct-to-site delivery.
               </p>
 
               {/* Call to Actions */}

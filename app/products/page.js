@@ -37,7 +37,7 @@ export default async function ProductsPage({ searchParams }) {
     { name: 'All Products', value: '' },
     { name: 'MS Pipes', value: 'MS Pipes' },
     { name: 'Roofing Sheets', value: 'Roofing Sheets' },
-    { name: 'TMT Bars', value: 'TMT Bars' },
+    { name: 'MS Angle & MS Flat', value: 'MS Angle & MS Flat' },
     { name: 'GP Pipes', value: 'GP Pipes' },
     { name: 'Angles & Channels', value: 'Angles & Channels' },
     { name: 'Other', value: 'Other' },
@@ -53,7 +53,7 @@ export default async function ProductsPage({ searchParams }) {
             Digital Product Catalog
           </h1>
           <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
-            Browse our range of high-grade steel pipes, TMT bars, and sheet profiles. Select a category below and request direct-to-site wholesale quotes.
+            Browse our range of high-grade steel pipes, MS Angles, MS Flats, and sheet profiles. Select a category below and request direct-to-site wholesale quotes.
           </p>
         </div>
 

@@ -17,7 +17,7 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide the category'],
       enum: {
-        values: ['MS Pipes', 'Roofing Sheets', 'TMT Bars', 'GP Pipes', 'Angles & Channels', 'Other'],
+        values: ['MS Pipes', 'Roofing Sheets', 'MS Angle & MS Flat', 'GP Pipes', 'Angles & Channels', 'Other'],
         message: '{VALUE} is not a valid category',
       },
       trim: true,

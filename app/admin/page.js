@@ -381,7 +381,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
     return matchesSearch && matchesStatus;
   });
 
-  const categories = ['MS Pipes', 'Roofing Sheets', 'TMT Bars', 'GP Pipes', 'Angles & Channels', 'Other'];
+  const categories = ['MS Pipes', 'Roofing Sheets', 'MS Angle & MS Flat', 'GP Pipes', 'Angles & Channels', 'Other'];
   const newLeadsCount = inquiries.filter(i => i.status === 'New').length;
 
   // 1. Password Gated Interface
@@ -905,7 +905,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       name="imageUrl"
                       value={formData.imageUrl}
                       onChange={handleFormChange}
-                      placeholder="e.g. /images/products/tmt.jpg"
+                      placeholder="e.g. /images/products/angle.jpg"
                       className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
                     />
                   </div>

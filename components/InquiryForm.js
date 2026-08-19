@@ -144,7 +144,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
             name="productNeeded"
             value={formData.productNeeded}
             onChange={handleChange}
-            placeholder="e.g. 5 Tons of MS Square Pipe 50mm, 20 TMT Rebars"
+            placeholder="e.g. 5 Tons of MS Square Pipe 50mm, 20 MS Angles, 10 MS Flat bars"
             className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-655 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>

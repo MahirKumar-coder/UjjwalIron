@@ -5,7 +5,7 @@ import { Phone, Mail, MapPin, BadgeCheck, ShieldCheck, Building2, Clock } from '
 export const metadata = {
   title: 'Contact & About Us | Ujjwal Iron Patna',
   description:
-    'Find Ujjwal Iron yard location, verified GST details, and contact information. Get in touch for structural steel supplies, MS Pipes, and TMT Bars in Patna.',
+    'Find Ujjwal Iron yard location, verified GST details, and contact information. Get in touch for structural steel supplies, MS Pipes, and MS Angles & Flats in Patna.',
 };
 
 export default function ContactPage() {
@@ -46,7 +46,7 @@ export default function ContactPage() {
                 Established in Patna, Ujjwal Iron has grown from a local merchant yard into one of Bihar’s most reliable suppliers of structural and industrial steel products. We serve contractors, developers, and retailers with transparency and efficiency.
               </p>
               <p>
-                As authorized dealers of prominent manufacturers, we ensure that every batch of MS Pipes, TMT Reinforcement Bars, and Roofing Sheets conforms to standard industry parameters and carries authentic manufacturer test certificates.
+                As authorized dealers of prominent manufacturers, we ensure that every batch of MS Pipes, MS Angles, MS Flats, and Roofing Sheets conforms to standard industry parameters and carries authentic manufacturer test certificates.
               </p>
             </div>
 
@@ -77,7 +77,7 @@ export default function ContactPage() {
               </svg>
               <h3 className="mt-4 font-bold text-slate-800 dark:text-slate-400">Patna Warehousing Stockyard</h3>
               <p className="text-xs text-slate-550 dark:text-slate-500 mt-2 max-w-xs">
-                Featuring robust storage for raw pipes, TMT, and flat steel, enabling prompt dispatches.
+                Featuring robust storage for raw pipes, structural angles, and flat steel, enabling prompt dispatches.
               </p>
             </div>
           </div>
