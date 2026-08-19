@@ -32,8 +32,8 @@ export default function InquiryForm() {
     }
 
     try {
-      // Step 1: Call Backend API to send Email
-      const response = await fetch('/api/send-inquiry', {
+      // Step 1: Call Backend API to save lead and send Email
+      const response = await fetch('/api/inquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
