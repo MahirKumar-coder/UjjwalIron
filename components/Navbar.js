@@ -59,7 +59,7 @@ export default function Navbar({ phone = '+918986043632' }) {
   const isActive = (path) => pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-slate-205 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors duration-300">
+    <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           
@@ -71,7 +71,7 @@ export default function Navbar({ phone = '+918986043632' }) {
                 src="/images/logo.jpg"
                 alt="Ujjwal Iron Logo"
                 onClick={handleLogoClick}
-                className="h-10 w-10 rounded-full border border-slate-202 dark:border-slate-800 object-cover shadow-md shadow-slate-905/10 transition-transform group-hover:scale-105 cursor-pointer"
+                className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-800 object-cover shadow-md shadow-slate-900/10 transition-transform group-hover:scale-105 cursor-pointer"
               />
               <span className="text-xl font-black tracking-wider text-slate-900 dark:text-white">
                 UJJWAL <span className="text-amber-500 cursor-pointer" onDoubleClick={() => router.push('/ca-portal')}>IRON</span>
@@ -114,7 +114,7 @@ export default function Navbar({ phone = '+918986043632' }) {
 
             <a
               href={`tel:${phone}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-amber-650 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/20 transition-all duration-300 hover:bg-amber-550 hover:shadow-amber-500/35 dark:bg-amber-600 dark:hover:bg-amber-500 dark:shadow-amber-600/20 dark:hover:shadow-amber-600/35"
+              className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/20 transition-all duration-300 hover:bg-amber-500 hover:shadow-amber-500/35 dark:bg-amber-600 dark:hover:bg-amber-500 dark:shadow-amber-600/20 dark:hover:shadow-amber-600/35"
             >
               <Phone size={16} />
               <span>Call Now</span>

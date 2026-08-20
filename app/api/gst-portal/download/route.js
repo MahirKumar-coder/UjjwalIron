@@ -52,6 +52,9 @@ export async function POST(request) {
               user: smtpUser,
               pass: smtpPass,
             },
+            tls: {
+              rejectUnauthorized: false
+            }
           });
 
           const mailOptions = {

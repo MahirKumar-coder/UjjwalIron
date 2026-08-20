@@ -249,11 +249,11 @@ export default function CaPortal() {
       <div className="flex min-h-screen items-center justify-center bg-stone-50 dark:bg-stone-950 px-4 transition-colors duration-300">
         <div className="w-full max-w-md rounded-3xl border border-stone-200 dark:border-stone-900 bg-white dark:bg-stone-900/50 p-8 shadow-xl backdrop-blur-md">
           <div className="flex flex-col items-center mb-6">
-            <div className="rounded-full bg-amber-600/10 dark:bg-amber-955/40 border border-amber-500/20 p-4 text-amber-600 dark:text-amber-500 mb-3">
+            <div className="rounded-full bg-amber-600/10 dark:bg-amber-950/20 border border-amber-500/20 p-4 text-amber-600 dark:text-amber-500 mb-3">
               <Lock size={32} />
             </div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white">CA Admin Gateway</h1>
-            <p className="text-sm text-stone-500 dark:text-stone-405 mt-1">Authorized financial officer access only</p>
+            <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">Authorized financial officer access only</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -265,12 +265,12 @@ export default function CaPortal() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter passcode..."
-                className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
               />
             </div>
 
             {loginError && (
-              <div className="flex items-start gap-2.5 rounded-xl bg-rose-50 dark:bg-rose-955/20 border border-rose-200 dark:border-rose-900/40 p-3 text-xs text-rose-600 dark:text-rose-400 font-bold">
+              <div className="flex items-start gap-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/40 p-3 text-xs text-rose-600 dark:text-rose-400 font-bold">
                 <AlertCircle size={16} className="shrink-0 animate-bounce" />
                 <span>{loginError}</span>
               </div>
@@ -290,7 +290,7 @@ export default function CaPortal() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 py-12 transition-colors duration-300">
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-955 py-12 transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header Dashboard strip */}
@@ -302,7 +302,7 @@ export default function CaPortal() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 rounded-xl border border-stone-200 dark:border-stone-850 bg-white dark:bg-stone-900 px-4 py-2.5 text-xs font-bold text-stone-600 dark:text-stone-300 hover:bg-stone-105 dark:hover:bg-stone-800 transition-colors"
+              className="flex items-center gap-2 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-4 py-2.5 text-xs font-bold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             >
               <LogOut size={14} />
               <span>Sign Out</span>
@@ -317,7 +317,7 @@ export default function CaPortal() {
             className={`flex items-center gap-2 pb-4 text-sm font-bold border-b-2 transition-all ${
               activeTab === 'customers'
                 ? 'border-amber-600 text-amber-600'
-                : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-850 dark:hover:text-white'
+                : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-white'
             }`}
           >
             <UserCheck size={16} />
@@ -328,7 +328,7 @@ export default function CaPortal() {
             className={`flex items-center gap-2 pb-4 text-sm font-bold border-b-2 transition-all ${
               activeTab === 'billing'
                 ? 'border-amber-600 text-amber-600'
-                : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-850 dark:hover:text-white'
+                : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-white'
             }`}
           >
             <Receipt size={16} />
@@ -354,7 +354,7 @@ export default function CaPortal() {
                       value={custForm.name}
                       onChange={(e) => setCustForm({ ...custForm, name: e.target.value })}
                       placeholder="e.g. Shyam Builders Patna"
-                      className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
+                      className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
 
@@ -366,7 +366,7 @@ export default function CaPortal() {
                       value={custForm.gstNo}
                       onChange={(e) => setCustForm({ ...custForm, gstNo: e.target.value.toUpperCase() })}
                       placeholder="e.g. 10AIAPR5590E1ZJ"
-                      className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
+                      className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
 
@@ -378,7 +378,7 @@ export default function CaPortal() {
                       value={custForm.mobileNo}
                       onChange={(e) => setCustForm({ ...custForm, mobileNo: e.target.value })}
                       placeholder="e.g. 9876543210"
-                      className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
+                      className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
 
@@ -390,19 +390,19 @@ export default function CaPortal() {
                       value={custForm.email}
                       onChange={(e) => setCustForm({ ...custForm, email: e.target.value })}
                       placeholder="e.g. billing@shyam.com"
-                      className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
+                      className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
 
                   {custError && (
-                    <div className="flex items-start gap-2 rounded-xl bg-rose-50 dark:bg-rose-955/20 border border-rose-200 dark:border-rose-900/30 p-3 text-xs text-rose-600">
+                    <div className="flex items-start gap-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/30 p-3 text-xs text-rose-600">
                       <AlertCircle size={14} className="shrink-0" />
                       <span>{custError}</span>
                     </div>
                   )}
 
                   {custSuccess && (
-                    <div className="flex items-start gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-955/20 border border-emerald-200 dark:border-emerald-900/30 p-3 text-xs text-emerald-600">
+                    <div className="flex items-start gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-900/30 p-3 text-xs text-emerald-600">
                       <CheckCircle size={14} className="shrink-0" />
                       <span>{custSuccess}</span>
                     </div>
@@ -433,7 +433,7 @@ export default function CaPortal() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                      <thead className="bg-stone-50 dark:bg-stone-950 text-stone-500 text-xs font-bold uppercase tracking-wider">
+                      <thead className="bg-stone-50 dark:bg-stone-900 text-stone-500 text-xs font-bold uppercase tracking-wider">
                         <tr>
                           <th className="px-4 py-3 rounded-l-xl">Name</th>
                           <th className="px-4 py-3">GSTIN</th>
@@ -452,7 +452,7 @@ export default function CaPortal() {
                             <td className="px-4 py-4 text-center">
                               <button
                                 onClick={() => handleDeleteCustomer(c._id)}
-                                className="text-rose-600 hover:text-rose-500 p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-955/20 transition-colors"
+                                className="text-rose-600 hover:text-rose-500 p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
                               >
                                 <Trash2 size={16} />
                               </button>
@@ -480,7 +480,7 @@ export default function CaPortal() {
                     required
                     value={billForm.gstNo}
                     onChange={(e) => setBillForm({ ...billForm, gstNo: e.target.value })}
-                    className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                    className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                   >
                     <option value="">-- Choose Client --</option>
                     {customers.map((c) => (
@@ -500,7 +500,7 @@ export default function CaPortal() {
                       value={billForm.billNo}
                       onChange={(e) => setBillForm({ ...billForm, billNo: e.target.value })}
                       placeholder="e.g. UI/2026/089"
-                      className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
+                      className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
 
@@ -511,7 +511,7 @@ export default function CaPortal() {
                       required
                       value={billForm.billDate}
                       onChange={(e) => setBillForm({ ...billForm, billDate: e.target.value })}
-                      className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                      className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -525,12 +525,12 @@ export default function CaPortal() {
                     value={billForm.totalAmount}
                     onChange={(e) => setBillForm({ ...billForm, totalAmount: e.target.value })}
                     placeholder="e.g. 150000"
-                    className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
+                    className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
                   />
                 </div>
 
                 {/* PDF File Uploader Input */}
-                <div className="border-2 border-dashed border-stone-300 dark:border-stone-800 rounded-2xl p-6 text-center bg-stone-50/50 dark:bg-stone-950/20">
+                <div className="border-2 border-dashed border-stone-300 dark:border-stone-800 rounded-2xl p-6 text-center bg-stone-50/50 dark:bg-stone-900/20">
                   <div className="flex flex-col items-center">
                     <Upload size={28} className="text-stone-400 mb-2" />
                     <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block mb-3">Upload Bill Document (PDF Only)</span>
@@ -544,7 +544,7 @@ export default function CaPortal() {
                     />
                     <label
                       htmlFor="pdf-file-uploader"
-                      className="px-4 py-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 rounded-xl text-xs font-bold text-stone-600 dark:text-stone-300 cursor-pointer hover:bg-stone-105 hover:border-stone-300 transition-colors shadow-sm inline-flex items-center gap-1.5"
+                      className="px-4 py-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl text-xs font-bold text-stone-600 dark:text-stone-300 cursor-pointer hover:bg-stone-100 hover:border-stone-300 transition-colors shadow-sm inline-flex items-center gap-1.5"
                     >
                       {pdfUploading ? (
                         <>
@@ -560,7 +560,7 @@ export default function CaPortal() {
                     </label>
 
                     {pdfUploadSuccess && (
-                      <div className="mt-3 inline-flex items-center gap-1 text-xs text-emerald-650 bg-emerald-50 dark:bg-emerald-955/20 border border-emerald-250/50 px-3 py-1 rounded-full font-bold">
+                      <div className="mt-3 inline-flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/50 px-3 py-1 rounded-full font-bold">
                         <FileText size={12} />
                         <span>PDF Invoice Attached successfully!</span>
                       </div>
@@ -569,14 +569,14 @@ export default function CaPortal() {
                 </div>
 
                 {billError && (
-                  <div className="flex items-start gap-2.5 rounded-xl bg-rose-50 dark:bg-rose-955/20 border border-rose-200 dark:border-rose-900/30 p-3.5 text-xs text-rose-600 font-bold">
+                  <div className="flex items-start gap-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/30 p-3.5 text-xs text-rose-600 font-bold">
                     <AlertCircle size={16} className="shrink-0 mt-0.5" />
                     <span>{billError}</span>
                   </div>
                 )}
 
                 {billSuccess && (
-                  <div className="flex items-start gap-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-955/20 border border-emerald-200 dark:border-emerald-900/30 p-3.5 text-xs text-emerald-600 font-bold">
+                  <div className="flex items-start gap-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-900/30 p-3.5 text-xs text-emerald-600 font-bold">
                     <CheckCircle size={16} className="shrink-0 mt-0.5" />
                     <span>{billSuccess}</span>
                   </div>

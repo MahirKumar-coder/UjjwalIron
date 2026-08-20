@@ -504,7 +504,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-200 dark:border-slate-900 pb-8 mb-10">
           <div>
             <h1 className="text-3xl font-black text-slate-900 dark:text-white">Ujjwal Iron Dashboard</h1>
-            <p className="mt-1.5 text-sm text-slate-655 dark:text-slate-400">Manage catalog products and view wholesale leads</p>
+            <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">Manage catalog products and view wholesale leads</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {activeTab === 'products' && (
@@ -528,7 +528,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
 
             <Link
               href="/ca-portal"
-              className="inline-flex items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-amber-600/10 hover:bg-amber-550 transition-colors"
+              className="inline-flex items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-amber-600/10 hover:bg-amber-500 transition-colors"
             >
               Go to CA Portal
             </Link>
@@ -549,7 +549,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 ${
               activeTab === 'products'
                 ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
-                : 'border-transparent text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-slate-200'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             Products Catalog ({products.length})
@@ -560,7 +560,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 flex items-center gap-2 ${
               activeTab === 'inquiries'
                 ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
-                : 'border-transparent text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-slate-200'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <span>Customer Inquiries</span>
@@ -569,7 +569,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                 {newLeadsCount} NEW
               </span>
             ) : (
-              <span className="rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-2 py-0.5 text-2xs font-semibold text-slate-550 dark:text-slate-400">
+              <span className="rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-2 py-0.5 text-2xs font-semibold text-slate-500 dark:text-slate-400">
                 {inquiries.length}
               </span>
             )}
@@ -580,7 +580,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 flex items-center gap-2 ${
               activeTab === 'gst'
                 ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
-                : 'border-transparent text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-slate-200'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <span>GST Audit & Notifications</span>
@@ -604,7 +604,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   placeholder="Search product name or brand..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-amber-500 focus:outline-none"
                 />
               </div>
               <div className="sm:col-span-4">
@@ -711,7 +711,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   placeholder="Search customer name, phone, or requirements..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-amber-500 focus:outline-none"
                 />
               </div>
               <div className="sm:col-span-4">
@@ -731,7 +731,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             {/* Inquiries Table */}
             <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/20 shadow-lg dark:shadow-2xl">
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left text-sm text-slate-550 dark:text-slate-400">
+                <table className="w-full border-collapse text-left text-sm text-slate-500 dark:text-slate-400">
                   <thead className="bg-slate-50 dark:bg-slate-900/60 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800">
                     <tr>
                       <th className="px-6 py-4">Customer Details</th>
@@ -760,9 +760,9 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                   <span className="h-2.5 w-2.5 rounded-full bg-amber-500 inline-block"></span>
                                 )}
                               </span>
-                              <span className="text-xs text-slate-550 dark:text-slate-300 mt-1 flex items-center gap-1">
+                              <span className="text-xs text-slate-500 dark:text-slate-300 mt-1 flex items-center gap-1">
                                 <Phone size={10} className="text-amber-600 dark:text-amber-500" />
-                                <a href={`tel:${inq.phone}`} className="hover:underline hover:text-amber-650 dark:hover:text-amber-400">
+                                <a href={`tel:${inq.phone}`} className="hover:underline hover:text-amber-500 dark:hover:text-amber-400">
                                   {inq.phone}
                                 </a>
                               </span>
@@ -770,7 +770,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           </td>
                           <td className="px-6 py-4 max-w-xs">
                             <div className="flex flex-col">
-                              <span className="text-slate-850 dark:text-slate-200 font-semibold truncate">{inq.productNeeded || 'General Rates Inquiry'}</span>
+                              <span className="text-slate-800 dark:text-slate-200 font-semibold truncate">{inq.productNeeded || 'General Rates Inquiry'}</span>
                               {inq.message && (
                                 <span className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2" title={inq.message}>
                                   {inq.message}
@@ -786,7 +786,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 inq.status === 'New'
                                   ? 'border-amber-200 dark:border-amber-900 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20'
                                   : inq.status === 'Contacted'
-                                  ? 'border-amber-200 dark:border-amber-900 text-amber-605 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-955/20'
+                                  ? 'border-amber-200 dark:border-amber-900 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20'
                                   : 'border-emerald-200 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
                               }`}
                             >
@@ -795,7 +795,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                               <option value="Closed">Closed</option>
                             </select>
                           </td>
-                          <td className="px-6 py-4 text-xs text-slate-450 dark:text-slate-500">
+                          <td className="px-6 py-4 text-xs text-slate-500 dark:text-slate-500">
                             {new Date(inq.createdAt).toLocaleString()}
                           </td>
                           <td className="px-6 py-4 text-right">
@@ -803,7 +803,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                               {/* Direct Call Icon */}
                               <a
                                 href={`tel:${inq.phone}`}
-                                className="p-2 text-slate-550 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                className="p-2 text-slate-500 hover:text-amber-500 dark:text-slate-400 dark:hover:text-amber-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 title="Call customer"
                               >
                                 <Phone size={16} />
@@ -813,7 +813,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 href={getWhatsAppLeadLink(inq)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-2 text-slate-550 hover:text-emerald-650 dark:text-slate-400 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                className="p-2 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 title="Respond on WhatsApp"
                               >
                                 <MessageSquare size={16} />
@@ -821,7 +821,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                               {/* Delete Lead Log */}
                               <button
                                 onClick={() => handleDeleteInquiry(inq._id)}
-                                className="p-2 text-slate-550 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                className="p-2 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 title="Delete inquiry"
                               >
                                 <Trash2 size={16} />
@@ -864,15 +864,15 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                         key={n._id}
                         className={`rounded-2xl border p-4 text-xs leading-relaxed transition-colors ${
                           n.read
-                            ? 'bg-slate-50/50 dark:bg-slate-955/20 border-slate-100 dark:border-slate-850 text-slate-500'
-                            : 'bg-amber-50/30 dark:bg-amber-955/10 border-amber-200/50 dark:border-amber-900/50 text-slate-850 dark:text-stone-300 font-medium'
+                            ? 'bg-slate-50/50 dark:bg-slate-900/20 border-slate-100 dark:border-slate-800 text-slate-500'
+                            : 'bg-amber-50/30 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-900/50 text-slate-800 dark:text-stone-300 font-medium'
                         }`}
                       >
                         <div className="flex justify-between items-center mb-1">
                           <span className={`px-2 py-0.5 rounded text-2xs uppercase font-extrabold ${
                             n.type === 'ca_login' 
-                              ? 'bg-blue-50 dark:bg-blue-955/20 text-blue-600 dark:text-blue-400' 
-                              : 'bg-emerald-50 dark:bg-emerald-955/20 text-emerald-600 dark:text-emerald-450'
+                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
+                              : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
                           }`}>
                             {n.type === 'ca_login' ? 'CA Logged In' : 'PDF Download'}
                           </span>
@@ -920,28 +920,28 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       .map((bill) => (
                         <div
                           key={bill._id}
-                          className="rounded-2xl border border-slate-200 dark:border-slate-850 p-4 bg-slate-50/30 dark:bg-slate-950/20 text-sm space-y-2"
+                          className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-slate-50/30 dark:bg-slate-950/20 text-sm space-y-2"
                         >
                           <div className="flex justify-between items-start">
                             <div>
                               <h4 className="font-bold text-slate-900 dark:text-white">Bill #{bill.billNo}</h4>
-                              <p className="text-xs text-slate-550">Date: {new Date(bill.billDate).toLocaleDateString()}</p>
+                              <p className="text-xs text-slate-500">Date: {new Date(bill.billDate).toLocaleDateString()}</p>
                             </div>
                             <span className="font-mono font-black text-amber-600 dark:text-amber-400">
                               ₹{bill.totalAmount.toFixed(2)}
                             </span>
                           </div>
                           
-                          <div className="text-xs text-slate-600 dark:text-slate-450 space-y-0.5">
+                          <div className="text-xs text-slate-605 dark:text-slate-400 space-y-0.5">
                             <div>Billed To: <span className="font-bold text-slate-800 dark:text-white">{bill.customerName}</span></div>
                             <div>GSTIN: <span className="font-mono font-semibold">{bill.gstNo}</span></div>
                           </div>
 
-                          <div className="border-t border-slate-100 dark:border-slate-850/80 pt-2 flex flex-wrap gap-2 text-2xs">
+                          <div className="border-t border-slate-100 dark:border-slate-800/80 pt-2 flex flex-wrap gap-2 text-2xs">
                             {bill.items.map((item, idx) => (
                               <span
                                 key={idx}
-                                className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-605 dark:text-slate-400 px-2 py-0.5 rounded"
+                                className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded"
                               >
                                 {item.name} ({item.qty}x)
                               </span>
