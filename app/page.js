@@ -244,7 +244,7 @@ export default function Home() {
 
       {/* Call to Action Quote Panel */}
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-slate-100 via-slate-50 to-amber-100/10 dark:from-slate-900 dark:via-slate-950 dark:to-amber-955/20 p-8 sm:p-12 md:p-16 shadow-xl dark:shadow-none">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-slate-100 via-slate-50 to-amber-100/10 dark:from-slate-900 dark:via-slate-950 dark:to-amber-900/20 p-8 sm:p-12 md:p-16 shadow-xl dark:shadow-none">
           
           {/* Background decoration */}
           <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-amber-600/5 blur-[100px] pointer-events-none"></div>

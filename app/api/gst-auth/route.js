@@ -87,7 +87,7 @@ Ujjwal Iron Sales Team`,
         ? 'OTP sent to your registered email address.' 
         : 'OTP generated (logged to terminal for development/testing).',
       // Return the OTP in development to help the user test if they don't have SMTP set up
-      devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined
+      devOtp: (process.env.NODE_ENV !== 'production' || process.env.DEV_OTP_MODE === 'true') ? otp : undefined
     });
   } catch (error) {
     return NextResponse.json(

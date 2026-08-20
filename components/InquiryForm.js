@@ -92,7 +92,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
       )}
 
       {status.success === false && (
-        <div className="mb-6 flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-955/20 border border-rose-250 dark:border-rose-900/60 p-4 text-sm text-rose-700 dark:text-rose-300">
+        <div className="mb-6 flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-900/20 border border-rose-250 dark:border-rose-900/60 p-4 text-sm text-rose-700 dark:text-rose-300">
           <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-450 shrink-0 mt-0.5" />
           <span>{status.message}</span>
         </div>

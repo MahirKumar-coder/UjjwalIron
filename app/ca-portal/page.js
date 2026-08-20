@@ -290,7 +290,7 @@ export default function CaPortal() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-955 py-12 transition-colors duration-300">
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 py-12 transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header Dashboard strip */}

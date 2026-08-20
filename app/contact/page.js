@@ -92,47 +92,47 @@ export default function ContactPage() {
               
               <ul className="space-y-6">
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 dark:bg-slate-955 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
+                  <div className="rounded-xl bg-slate-100 dark:bg-slate-900 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
                     <MapPin size={20} />
                   </div>
                   <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-450 dark:text-slate-500 mb-1">Our Stockyard & Office</h5>
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-1">Our Stockyard & Office</h5>
                     <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{address}</p>
                   </div>
                 </li>
 
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 dark:bg-slate-955 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
+                  <div className="rounded-xl bg-slate-100 dark:bg-slate-900 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
                     <Phone size={20} />
                   </div>
                   <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-450 dark:text-slate-500 mb-1">Call Sales Desk</h5>
-                    <a href={`tel:${phone}`} className="text-base font-bold text-slate-900 dark:text-white hover:text-amber-650 dark:hover:text-amber-400 transition-colors">
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-1">Call Sales Desk</h5>
+                    <a href={`tel:${phone}`} className="text-base font-bold text-slate-900 dark:text-white hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
                       {phone}
                     </a>
                   </div>
                 </li>
 
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 dark:bg-slate-955 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
+                  <div className="rounded-xl bg-slate-100 dark:bg-slate-900 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
                     <Mail size={20} />
                   </div>
                   <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-455 dark:text-slate-500 mb-1">Email Inquiries</h5>
-                    <a href={`mailto:${email}`} className="text-sm text-slate-705 dark:text-slate-300 hover:text-amber-650 dark:hover:text-amber-400 transition-colors">
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-1">Email Inquiries</h5>
+                    <a href={`mailto:${email}`} className="text-sm text-slate-700 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
                       {email}
                     </a>
                   </div>
                 </li>
 
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 dark:bg-slate-955 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
+                  <div className="rounded-xl bg-slate-100 dark:bg-slate-900 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
                     <Clock size={20} />
                   </div>
                   <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-450 dark:text-slate-500 mb-1">Yard Hours</h5>
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-1">Yard Hours</h5>
                     <p className="text-sm text-slate-700 dark:text-slate-300">Mon - Sat: 09:00 AM - 07:00 PM</p>
-                    <p className="text-xs text-slate-500 mt-1">Sundays Closed</p>
+                    <p className="text-xs text-slate-550 mt-1">Sundays Closed</p>
                   </div>
                 </li>
               </ul>

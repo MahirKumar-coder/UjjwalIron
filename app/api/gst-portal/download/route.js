@@ -81,7 +81,7 @@ Ujjwal Iron Sales Team`,
       return NextResponse.json({
         success: true,
         message: emailSent ? 'OTP code sent to your registered email.' : 'OTP generated (logged to terminal for development/testing).',
-        devOtp: process.env.NODE_ENV !== 'production' ? code : undefined
+        devOtp: (process.env.NODE_ENV !== 'production' || process.env.DEV_OTP_MODE === 'true') ? code : undefined
       });
     }
 
