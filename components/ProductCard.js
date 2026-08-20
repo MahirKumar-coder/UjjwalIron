@@ -22,15 +22,15 @@ Please share the current pricing. Thank you!`;
   };
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:border-slate-350 dark:hover:border-slate-700 hover:shadow-xl dark:hover:shadow-blue-900/20">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:border-slate-350 dark:hover:border-slate-700 hover:shadow-xl dark:hover:shadow-amber-950/20">
       
       {/* Brand & Category Badges */}
       <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-2">
-        <span className="flex items-center gap-1 rounded-full bg-blue-50/95 dark:bg-blue-950/80 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 backdrop-blur-md border border-blue-200/50 dark:border-blue-800/50">
+        <span className="flex items-center gap-1 rounded-full bg-amber-50/95 dark:bg-amber-950/80 px-3 py-1 text-xs font-semibold text-amber-650 dark:text-amber-400 backdrop-blur-md border border-amber-200/50 dark:border-amber-900/50">
           <Shield size={12} />
           {brand}
         </span>
-        <span className="flex items-center gap-1 rounded-full bg-slate-105/95 dark:bg-slate-950/80 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 backdrop-blur-md border border-slate-200 dark:border-slate-850/50">
+        <span className="flex items-center gap-1 rounded-full bg-slate-100/95 dark:bg-slate-950/80 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 backdrop-blur-md border border-slate-200 dark:border-slate-850/50">
           <Tag size={12} />
           {category}
         </span>
@@ -52,7 +52,7 @@ Please share the current pricing. Thank you!`;
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center bg-slate-100 dark:bg-slate-950 text-slate-400 dark:text-slate-700">
             <svg
-              className="h-16 w-16 text-slate-350 dark:text-slate-800 transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-900"
+              className="h-16 w-16 text-slate-350 dark:text-slate-800 transition-colors group-hover:text-amber-600 dark:group-hover:text-amber-900"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -73,12 +73,12 @@ Please share the current pricing. Thank you!`;
 
       {/* Content Section */}
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors group-hover:text-amber-600 dark:group-hover:text-amber-400">
           {name}
         </h3>
         
         {description && (
-          <p className="mt-2 text-sm text-slate-550 dark:text-slate-400 line-clamp-2">
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
             {description}
           </p>
         )}
@@ -88,7 +88,7 @@ Please share the current pricing. Thank you!`;
           <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-slate-200 dark:border-slate-800/80 pt-3">
             {specifications.slice(0, 3).map((spec, index) => (
               <div key={index} className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                <span className="font-semibold text-slate-400 dark:text-slate-550">{spec.key}:</span>
+                <span className="font-semibold text-slate-400 dark:text-slate-500">{spec.key}:</span>
                 <span className="text-slate-700 dark:text-slate-300">{spec.value}</span>
               </div>
             ))}
@@ -99,7 +99,7 @@ Please share the current pricing. Thank you!`;
         <div className="mt-auto pt-5">
           <div className="flex items-baseline justify-between mb-4">
             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estimated Price</span>
-            <span className="text-lg font-extrabold text-blue-600 dark:text-blue-400">{price}</span>
+            <span className="text-lg font-extrabold text-amber-600 dark:text-amber-450">{price}</span>
           </div>
 
           {/* Normal Solid WhatsApp CTA Button */}

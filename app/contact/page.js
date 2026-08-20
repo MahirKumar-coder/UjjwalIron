@@ -34,7 +34,7 @@ export default function ContactPage() {
         {/* Section 1: History and Credibility */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 px-3.5 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 mb-6">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-250 dark:border-amber-900/50 px-3.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400 mb-6">
               <Building2 size={12} />
               <span>Our Legacy</span>
             </div>
@@ -60,7 +60,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-4 shadow-sm dark:shadow-none">
-                <ShieldCheck className="h-6 w-6 text-blue-600 dark:text-blue-400 shrink-0" />
+                <ShieldCheck className="h-6 w-6 text-amber-600 dark:text-amber-400 shrink-0" />
                 <div>
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white">Authorized Dealer</h4>
                   <p className="text-xs text-slate-500">Tata, Jindal, SAIL</p>
@@ -73,7 +73,7 @@ export default function ContactPage() {
             {/* Visual representation of warehouse */}
             <div className="absolute inset-0 bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center text-slate-400 dark:text-slate-700 p-6 text-center">
               <svg className="h-20 w-20 text-slate-350 dark:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
               <h3 className="mt-4 font-bold text-slate-800 dark:text-slate-400">Patna Warehousing Stockyard</h3>
               <p className="text-xs text-slate-550 dark:text-slate-500 mt-2 max-w-xs">
@@ -92,7 +92,7 @@ export default function ContactPage() {
               
               <ul className="space-y-6">
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 dark:bg-slate-950 p-3 border border-slate-200 dark:border-slate-800 text-blue-600 dark:text-blue-500 shrink-0">
+                  <div className="rounded-xl bg-slate-100 dark:bg-slate-955 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
                     <MapPin size={20} />
                   </div>
                   <div>
@@ -102,31 +102,31 @@ export default function ContactPage() {
                 </li>
 
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 dark:bg-slate-950 p-3 border border-slate-200 dark:border-slate-800 text-blue-600 dark:text-blue-500 shrink-0">
+                  <div className="rounded-xl bg-slate-100 dark:bg-slate-955 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
                     <Phone size={20} />
                   </div>
                   <div>
                     <h5 className="text-xs font-bold uppercase tracking-wider text-slate-450 dark:text-slate-500 mb-1">Call Sales Desk</h5>
-                    <a href={`tel:${phone}`} className="text-base font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <a href={`tel:${phone}`} className="text-base font-bold text-slate-900 dark:text-white hover:text-amber-650 dark:hover:text-amber-400 transition-colors">
                       {phone}
                     </a>
                   </div>
                 </li>
 
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 dark:bg-slate-950 p-3 border border-slate-200 dark:border-slate-800 text-blue-600 dark:text-blue-500 shrink-0">
+                  <div className="rounded-xl bg-slate-100 dark:bg-slate-955 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
                     <Mail size={20} />
                   </div>
                   <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-450 dark:text-slate-500 mb-1">Email Inquiries</h5>
-                    <a href={`mailto:${email}`} className="text-sm text-slate-705 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-455 dark:text-slate-500 mb-1">Email Inquiries</h5>
+                    <a href={`mailto:${email}`} className="text-sm text-slate-705 dark:text-slate-300 hover:text-amber-650 dark:hover:text-amber-400 transition-colors">
                       {email}
                     </a>
                   </div>
                 </li>
 
                 <li className="flex items-start gap-4">
-                  <div className="rounded-xl bg-slate-100 dark:bg-slate-950 p-3 border border-slate-200 dark:border-slate-800 text-blue-600 dark:text-blue-500 shrink-0">
+                  <div className="rounded-xl bg-slate-100 dark:bg-slate-955 p-3 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-500 shrink-0">
                     <Clock size={20} />
                   </div>
                   <div>
@@ -147,8 +147,8 @@ export default function ContactPage() {
 
         {/* Section 3: Maps Frame */}
         <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 shadow-xl dark:shadow-none">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-800/80 text-xs font-bold uppercase tracking-wider text-slate-450 dark:text-slate-500">
-            <MapPin size={14} className="text-blue-600 dark:text-blue-500" />
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-800/80 text-xs font-bold uppercase tracking-wider text-slate-455 dark:text-slate-500">
+            <MapPin size={14} className="text-amber-600 dark:text-amber-500" />
             <span>Interactive Yard Route (Google Maps)</span>
           </div>
           <iframe

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   Plus, 
   Edit, 
@@ -25,7 +26,9 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState('');
   const [products, setProducts] = useState([]);
   const [inquiries, setInquiries] = useState([]);
-  const [activeTab, setActiveTab] = useState('products'); // 'products' or 'inquiries'
+  const [activeTab, setActiveTab] = useState('products'); // 'products', 'inquiries', or 'gst'
+  const [gstBills, setGstBills] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   
   // Search and Filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -114,6 +117,8 @@ export default function AdminPage() {
         setPasscode(passToVerify);
         // Fetch inquiries as well
         fetchInquiries(passToVerify);
+        fetchGstBills(passToVerify);
+        fetchNotifications(passToVerify);
       } else {
         setAuthError(result.error || 'Authentication failed.');
         sessionStorage.removeItem('admin_pass');
@@ -174,6 +179,58 @@ export default function AdminPage() {
       console.error('Failed to fetch inquiries', err);
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const fetchGstBills = async (pass = passcode) => {
+    setActionLoading(true);
+    try {
+      const response = await fetch('/api/ca/bills', {
+        headers: {
+          'x-admin-password': pass,
+        },
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setGstBills(result.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch GST bills', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const fetchNotifications = async (pass = passcode) => {
+    try {
+      const response = await fetch('/api/admin/notifications', {
+        headers: {
+          'x-admin-password': pass,
+        },
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setNotifications(result.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch notifications', err);
+    }
+  };
+
+  const clearNotifications = async () => {
+    try {
+      const response = await fetch('/api/admin/notifications/read', {
+        method: 'POST',
+        headers: {
+          'x-admin-password': passcode,
+        },
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        fetchNotifications(passcode);
+      }
+    } catch (err) {
+      console.error('Failed to clear notifications', err);
     }
   };
 
@@ -390,7 +447,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
       <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-8 shadow-xl dark:shadow-2xl backdrop-blur-md">
           <div className="text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-605 dark:text-blue-500">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-600/10 border border-amber-500/20 text-amber-650 dark:text-amber-500">
               <Lock size={28} />
             </div>
             <h2 className="mt-6 text-3xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -412,7 +469,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                 required
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-700 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
                 placeholder="Enter Admin Password"
               />
             </div>
@@ -427,7 +484,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500 disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-amber-600/20 hover:bg-amber-500 disabled:opacity-50"
               >
                 {loading ? 'Authenticating...' : 'Access Dashboard'}
               </button>
@@ -453,7 +510,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             {activeTab === 'products' && (
               <button
                 onClick={openAddModal}
-                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500 transition-all duration-200"
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-amber-600/20 hover:bg-amber-500 transition-all duration-200"
               >
                 <Plus size={16} />
                 <span>Add New Product</span>
@@ -468,6 +525,13 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             >
               <RefreshCw size={16} className={actionLoading ? 'animate-spin' : ''} />
             </button>
+
+            <Link
+              href="/ca-portal"
+              className="inline-flex items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-amber-600/10 hover:bg-amber-550 transition-colors"
+            >
+              Go to CA Portal
+            </Link>
 
             <button
               onClick={handleLogout}
@@ -484,7 +548,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             onClick={() => { setActiveTab('products'); setSearchQuery(''); }}
             className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 ${
               activeTab === 'products'
-                ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500'
+                ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
                 : 'border-transparent text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
@@ -495,7 +559,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             onClick={() => { setActiveTab('inquiries'); setSearchQuery(''); }}
             className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 flex items-center gap-2 ${
               activeTab === 'inquiries'
-                ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500'
+                ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
                 : 'border-transparent text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
@@ -507,6 +571,22 @@ We would like to share the latest wholesale rates and specifications. Let us kno
             ) : (
               <span className="rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-2 py-0.5 text-2xs font-semibold text-slate-550 dark:text-slate-400">
                 {inquiries.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('gst'); setSearchQuery(''); fetchGstBills(); fetchNotifications(); }}
+            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 flex items-center gap-2 ${
+              activeTab === 'gst'
+                ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
+                : 'border-transparent text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-slate-200'
+            }`}
+          >
+            <span>GST Audit & Notifications</span>
+            {notifications.filter(n => !n.read).length > 0 && (
+              <span className="rounded-full bg-amber-600 px-2 py-0.5 text-2xs font-extrabold text-white animate-pulse">
+                {notifications.filter(n => !n.read).length} NEW
               </span>
             )}
           </button>
@@ -524,14 +604,14 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   placeholder="Search product name or brand..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:border-amber-500 focus:outline-none"
                 />
               </div>
               <div className="sm:col-span-4">
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-4 py-3 text-sm text-slate-600 dark:text-slate-350 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-4 py-3 text-sm text-slate-600 dark:text-slate-350 focus:border-amber-500 focus:outline-none"
                 >
                   <option value="">All Categories</option>
                   {categories.map((c) => (
@@ -577,7 +657,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                               <Tag size={10} /> {prod.category}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-blue-600 dark:text-blue-400 font-bold">
+                          <td className="px-6 py-4 text-amber-600 dark:text-amber-400 font-bold">
                             {prod.price}
                           </td>
                           <td className="px-6 py-4">
@@ -631,14 +711,14 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   placeholder="Search customer name, phone, or requirements..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:border-amber-500 focus:outline-none"
                 />
               </div>
               <div className="sm:col-span-4">
                 <select
                   value={leadStatusFilter}
                   onChange={(e) => setLeadStatusFilter(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-4 py-3 text-sm text-slate-600 dark:text-slate-350 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-4 py-3 text-sm text-slate-600 dark:text-slate-350 focus:border-amber-500 focus:outline-none"
                 >
                   <option value="">All Statuses</option>
                   <option value="New">New leads</option>
@@ -671,18 +751,18 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       </tr>
                     ) : (
                       filteredInquiries.map((inq) => (
-                        <tr key={inq._id} className={`hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors ${inq.status === 'New' ? 'bg-blue-50/20 dark:bg-blue-955/5' : ''}`}>
+                        <tr key={inq._id} className={`hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors ${inq.status === 'New' ? 'bg-amber-50/20 dark:bg-amber-950/5' : ''}`}>
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
                               <span className="text-slate-900 dark:text-white font-bold flex items-center gap-1.5">
                                 {inq.name}
                                 {inq.status === 'New' && (
-                                  <span className="h-2.5 w-2.5 rounded-full bg-blue-500 inline-block"></span>
+                                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500 inline-block"></span>
                                 )}
                               </span>
                               <span className="text-xs text-slate-550 dark:text-slate-300 mt-1 flex items-center gap-1">
-                                <Phone size={10} className="text-blue-600 dark:text-blue-500" />
-                                <a href={`tel:${inq.phone}`} className="hover:underline hover:text-blue-605 dark:hover:text-blue-400">
+                                <Phone size={10} className="text-amber-600 dark:text-amber-500" />
+                                <a href={`tel:${inq.phone}`} className="hover:underline hover:text-amber-650 dark:hover:text-amber-400">
                                   {inq.phone}
                                 </a>
                               </span>
@@ -704,7 +784,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                               onChange={(e) => handleUpdateInquiryStatus(inq._id, e.target.value)}
                               className={`rounded-lg border px-2.5 py-1 text-xs font-bold focus:outline-none bg-white dark:bg-slate-950 ${
                                 inq.status === 'New'
-                                  ? 'border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/20'
+                                  ? 'border-amber-200 dark:border-amber-900 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20'
                                   : inq.status === 'Contacted'
                                   ? 'border-amber-200 dark:border-amber-900 text-amber-605 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-955/20'
                                   : 'border-emerald-200 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
@@ -723,7 +803,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                               {/* Direct Call Icon */}
                               <a
                                 href={`tel:${inq.phone}`}
-                                className="p-2 text-slate-550 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                className="p-2 text-slate-550 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 title="Call customer"
                               >
                                 <Phone size={16} />
@@ -758,6 +838,125 @@ We would like to share the latest wholesale rates and specifications. Let us kno
           </div>
         )}
 
+        {/* Tab 3: GST Bills & Notifications Panel */}
+        {activeTab === 'gst' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* Notifications Feed Column */}
+            <div className="lg:col-span-5">
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 p-6 shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Live Notifications Feed</h3>
+                  <button
+                    onClick={clearNotifications}
+                    className="text-xs text-amber-600 dark:text-amber-500 hover:underline font-bold"
+                  >
+                    Mark All Read
+                  </button>
+                </div>
+
+                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                  {notifications.length === 0 ? (
+                    <p className="text-sm text-slate-500 text-center py-6">No notifications logged yet.</p>
+                  ) : (
+                    notifications.map((n) => (
+                      <div
+                        key={n._id}
+                        className={`rounded-2xl border p-4 text-xs leading-relaxed transition-colors ${
+                          n.read
+                            ? 'bg-slate-50/50 dark:bg-slate-955/20 border-slate-100 dark:border-slate-850 text-slate-500'
+                            : 'bg-amber-50/30 dark:bg-amber-955/10 border-amber-200/50 dark:border-amber-900/50 text-slate-850 dark:text-stone-300 font-medium'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center mb-1">
+                          <span className={`px-2 py-0.5 rounded text-2xs uppercase font-extrabold ${
+                            n.type === 'ca_login' 
+                              ? 'bg-blue-50 dark:bg-blue-955/20 text-blue-600 dark:text-blue-400' 
+                              : 'bg-emerald-50 dark:bg-emerald-955/20 text-emerald-600 dark:text-emerald-450'
+                          }`}>
+                            {n.type === 'ca_login' ? 'CA Logged In' : 'PDF Download'}
+                          </span>
+                          <span className="text-2xs text-slate-400">{new Date(n.createdAt).toLocaleTimeString()}</span>
+                        </div>
+                        <p>{n.message}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* GST Bills history & search column */}
+            <div className="lg:col-span-7">
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">GST Billing History</h3>
+                
+                {/* Search input query */}
+                <div className="relative mb-6">
+                  <Search className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by customer name or bill number..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-11 pr-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                  {gstBills.filter(
+                    (b) =>
+                      b.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      b.billNo.toLowerCase().includes(searchQuery.toLowerCase())
+                  ).length === 0 ? (
+                    <p className="text-sm text-slate-500 text-center py-6">No matching bills found.</p>
+                  ) : (
+                    gstBills
+                      .filter(
+                        (b) =>
+                          b.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          b.billNo.toLowerCase().includes(searchQuery.toLowerCase())
+                      )
+                      .map((bill) => (
+                        <div
+                          key={bill._id}
+                          className="rounded-2xl border border-slate-200 dark:border-slate-850 p-4 bg-slate-50/30 dark:bg-slate-950/20 text-sm space-y-2"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="font-bold text-slate-900 dark:text-white">Bill #{bill.billNo}</h4>
+                              <p className="text-xs text-slate-550">Date: {new Date(bill.billDate).toLocaleDateString()}</p>
+                            </div>
+                            <span className="font-mono font-black text-amber-600 dark:text-amber-400">
+                              ₹{bill.totalAmount.toFixed(2)}
+                            </span>
+                          </div>
+                          
+                          <div className="text-xs text-slate-600 dark:text-slate-450 space-y-0.5">
+                            <div>Billed To: <span className="font-bold text-slate-800 dark:text-white">{bill.customerName}</span></div>
+                            <div>GSTIN: <span className="font-mono font-semibold">{bill.gstNo}</span></div>
+                          </div>
+
+                          <div className="border-t border-slate-100 dark:border-slate-850/80 pt-2 flex flex-wrap gap-2 text-2xs">
+                            {bill.items.map((item, idx) => (
+                              <span
+                                key={idx}
+                                className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-605 dark:text-slate-400 px-2 py-0.5 rounded"
+                              >
+                                {item.name} ({item.qty}x)
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
         {/* Modal Form for Add/Edit Products */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
@@ -788,7 +987,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       value={formData.name}
                       onChange={handleFormChange}
                       placeholder="e.g. MS Pipe 3 Inch Heavy"
-                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
 
@@ -804,7 +1003,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       value={formData.brand}
                       onChange={handleFormChange}
                       placeholder="e.g. Tata Structura"
-                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -819,7 +1018,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       name="category"
                       value={formData.category}
                       onChange={handleFormChange}
-                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-700 dark:text-slate-350 focus:border-blue-500 focus:outline-none"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-700 dark:text-slate-350 focus:border-amber-500 focus:outline-none"
                     >
                       {categories.map((c) => (
                         <option key={c} value={c}>{c}</option>
@@ -838,7 +1037,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       value={formData.price}
                       onChange={handleFormChange}
                       placeholder="e.g. ₹55,000/Ton or On Request"
-                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -875,7 +1074,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                         />
                         <label
                           htmlFor="admin-image-upload"
-                          className={`inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-blue-500 cursor-pointer select-none transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
+                          className={`inline-flex items-center justify-center rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-amber-500 cursor-pointer select-none transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
                         >
                           {uploading ? 'Uploading...' : 'Upload Image File'}
                         </label>
@@ -906,7 +1105,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       value={formData.imageUrl}
                       onChange={handleFormChange}
                       placeholder="e.g. /images/products/angle.jpg"
-                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -922,7 +1121,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     value={formData.description}
                     onChange={handleFormChange}
                     placeholder="Brief summary of grade, application, or features..."
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:outline-none resize-none"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none resize-none"
                   ></textarea>
                 </div>
 
@@ -935,7 +1134,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     <button
                       type="button"
                       onClick={addSpecField}
-                      className="text-xs font-bold text-blue-600 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-400"
+                      className="text-xs font-bold text-amber-600 dark:text-amber-500 hover:text-amber-500 dark:hover:text-amber-400"
                     >
                       + Add Specification Row
                     </button>
@@ -978,7 +1177,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     name="isActive"
                     checked={formData.isActive}
                     onChange={handleFormChange}
-                    className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 text-blue-600 focus:ring-0 focus:ring-offset-0"
+                    className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 text-amber-600 focus:ring-0 focus:ring-offset-0"
                   />
                   <label htmlFor="isActive" className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-350 select-none">
                     Show product in user catalog (Active)
@@ -997,7 +1196,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   <button
                     type="submit"
                     disabled={loading}
-                    className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg hover:bg-blue-500 disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-lg hover:bg-amber-500 disabled:opacity-50"
                   >
                     <Save size={16} />
                     <span>{loading ? 'Saving...' : 'Save Product'}</span>

@@ -2,16 +2,17 @@ import { NextResponse } from 'next/server';
 
 function isAuthenticated(request) {
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-  const requestPassword = request.headers.get('x-admin-password');
-  return requestPassword === adminPassword;
+  const caPassword = process.env.CA_PASSWORD || 'ca123';
+  const requestPassword = request.headers.get('x-admin-password') || request.headers.get('x-ca-password');
+  return requestPassword === adminPassword || requestPassword === caPassword;
 }
 
-// POST /api/upload - Handle admin image uploads to Cloudinary
+// POST /api/upload - Handle admin/ca file uploads (images and PDFs) to Cloudinary
 export async function POST(request) {
   try {
     if (!isAuthenticated(request)) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized. Invalid admin password.' },
+        { success: false, error: 'Unauthorized passcode.' },
         { status: 401 }
       );
     }
@@ -41,9 +42,9 @@ export async function POST(request) {
     cloudinaryFormData.append('file', file);
     cloudinaryFormData.append('upload_preset', uploadPreset);
 
-    // Call Cloudinary Upload Endpoint
+    // Call Cloudinary Upload Endpoint (using /auto/upload to support images and PDFs)
     const cloudinaryResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
       {
         method: 'POST',
         body: cloudinaryFormData,
@@ -54,12 +55,12 @@ export async function POST(request) {
 
     if (!cloudinaryResponse.ok) {
       return NextResponse.json(
-        { success: false, error: result.error?.message || 'Failed to upload image to Cloudinary.' },
+        { success: false, error: result.error?.message || 'Failed to upload asset to Cloudinary.' },
         { status: cloudinaryResponse.status }
       );
     }
 
-    // Return the permanent, secure URL of the uploaded image
+    // Return the permanent, secure URL of the uploaded image/PDF
     return NextResponse.json({
       success: true,
       url: result.secure_url

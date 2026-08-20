@@ -52,29 +52,31 @@ export default function Navbar({ phone = '+918986043632' }) {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Products', href: '/products' },
+    { name: 'GST Portal', href: '/gst-portal' },
     { name: 'Contact Us', href: '/contact' },
   ];
 
   const isActive = (path) => pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors duration-300">
+    <nav className="sticky top-0 z-50 border-b border-slate-205 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           
           {/* Logo / Brand Name */}
           <div className="flex items-center">
-            <a href="/" onClick={handleLogoClick} className="flex items-center gap-2.5 group select-none">
+            <div className="flex items-center gap-2.5 group select-none">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/logo.jpg"
                 alt="Ujjwal Iron Logo"
-                className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-800 object-cover shadow-md shadow-slate-900/10 transition-transform group-hover:scale-105"
+                onClick={handleLogoClick}
+                className="h-10 w-10 rounded-full border border-slate-202 dark:border-slate-800 object-cover shadow-md shadow-slate-905/10 transition-transform group-hover:scale-105 cursor-pointer"
               />
               <span className="text-xl font-black tracking-wider text-slate-900 dark:text-white">
-                UJJWAL <span className="text-blue-500">IRON</span>
+                UJJWAL <span className="text-amber-500 cursor-pointer" onDoubleClick={() => router.push('/ca-portal')}>IRON</span>
               </span>
-            </a>
+            </div>
           </div>
 
           {/* Desktop Navigation Links */}
@@ -86,7 +88,7 @@ export default function Navbar({ phone = '+918986043632' }) {
                   href={link.href}
                   className={`text-sm font-semibold transition-colors duration-200 ${
                     isActive(link.href) 
-                      ? 'text-blue-600 dark:text-blue-500' 
+                      ? 'text-amber-500 dark:text-amber-400' 
                       : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
                   }`}
                 >
@@ -106,13 +108,13 @@ export default function Navbar({ phone = '+918986043632' }) {
               {theme === 'dark' ? (
                 <Sun size={18} className="text-amber-500" />
               ) : (
-                <Moon size={18} className="text-blue-600" />
+                <Moon size={18} className="text-amber-600" />
               )}
             </button>
 
             <a
               href={`tel:${phone}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:bg-blue-500 hover:shadow-blue-600/35"
+              className="inline-flex items-center gap-2 rounded-xl bg-amber-650 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/20 transition-all duration-300 hover:bg-amber-550 hover:shadow-amber-500/35 dark:bg-amber-600 dark:hover:bg-amber-500 dark:shadow-amber-600/20 dark:hover:shadow-amber-600/35"
             >
               <Phone size={16} />
               <span>Call Now</span>
@@ -129,7 +131,7 @@ export default function Navbar({ phone = '+918986043632' }) {
               {theme === 'dark' ? (
                 <Sun size={16} className="text-amber-500" />
               ) : (
-                <Moon size={16} className="text-blue-600" />
+                <Moon size={16} className="text-amber-600" />
               )}
             </button>
             
@@ -160,8 +162,8 @@ export default function Navbar({ phone = '+918986043632' }) {
               onClick={() => setIsOpen(false)}
               className={`block rounded-xl px-4 py-3 text-base font-semibold transition-colors ${
                 isActive(link.href)
-                  ? 'bg-blue-600/10 text-blue-600 dark:text-blue-400'
-                  : 'text-slate-655 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white'
+                  ? 'bg-amber-600/10 text-amber-600 dark:text-amber-400'
+                  : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white'
               }`}
             >
               {link.name}
@@ -174,7 +176,7 @@ export default function Navbar({ phone = '+918986043632' }) {
           <a
             href={`tel:${phone}`}
             onClick={() => setIsOpen(false)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-base font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500 transition-colors"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 py-3 text-base font-bold text-white shadow-lg shadow-amber-600/20 hover:bg-amber-500 transition-colors"
           >
             <Phone size={18} />
             <span>Call Now</span>

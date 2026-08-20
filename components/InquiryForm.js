@@ -47,7 +47,7 @@ export default function InquiryForm() {
           message: 'Inquiry submitted! Redirecting to WhatsApp...',
         });
 
-        // Step 2: Trigger WhatsApp Redirect (Owner ka number yahan daalo)
+        // Step 2: Trigger WhatsApp Redirect
         const ownerWhatsAppNumber = '918986043632'; // Make sure 91 is prepended
         const text = `Hi Ujjwal Iron, I have a new inquiry:
 - *Name:* ${formData.name}
@@ -61,7 +61,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
         setTimeout(() => {
             window.open(whatsappUrl, '_blank');
         }, 1500); // 1.5 second delay so they can read the success message
-
+        
         // Clear form
         setFormData({ name: '', phone: '', productNeeded: '', message: '' });
       } else {
@@ -76,7 +76,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
         message: 'Network error. Please check your internet connection.',
       });
     } finally {
-      setLoading(false);
+      loading && setLoading(false);
     }
   };
 
@@ -92,8 +92,8 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
       )}
 
       {status.success === false && (
-        <div className="mb-6 flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-250 dark:border-rose-900/60 p-4 text-sm text-rose-700 dark:text-rose-300">
-          <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+        <div className="mb-6 flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-955/20 border border-rose-250 dark:border-rose-900/60 p-4 text-sm text-rose-700 dark:text-rose-300">
+          <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-450 shrink-0 mt-0.5" />
           <span>{status.message}</span>
         </div>
       )}
@@ -112,7 +112,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
             value={formData.name}
             onChange={handleChange}
             placeholder="e.g. Ramesh Kumar"
-            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
           />
         </div>
 
@@ -129,7 +129,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
             value={formData.phone}
             onChange={handleChange}
             placeholder="e.g. +91 99999 99999"
-            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-655 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
           />
         </div>
 
@@ -145,7 +145,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
             value={formData.productNeeded}
             onChange={handleChange}
             placeholder="e.g. 5 Tons of MS Square Pipe 50mm, 20 MS Angles, 10 MS Flat bars"
-            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-655 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
           />
         </div>
 
@@ -161,7 +161,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
             value={formData.message}
             onChange={handleChange}
             placeholder="Describe your size, thickness, grade, or delivery location details..."
-            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-655 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none"
           ></textarea>
         </div>
 
@@ -169,7 +169,7 @@ ${formData.message ? `- *Details:* ${formData.message}` : ''}`;
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:bg-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-amber-600/20 transition-all duration-300 hover:bg-amber-550 disabled:opacity-50 disabled:pointer-events-none"
         >
           {loading ? (
             <span className="flex h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>

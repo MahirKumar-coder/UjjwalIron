@@ -27,7 +27,7 @@ export default function Home() {
       title: 'MS Pipes & Tubes',
       desc: 'High durability Mild Steel pipes, structural hollow sections (RHS/SHS), and water pipes.',
       brands: 'Jindal Star, Tata Structura, APL Apollo',
-      icon: <Layers className="h-5 w-5 text-blue-650 dark:text-blue-500" />,
+      icon: <Layers className="h-5 w-5 text-amber-500 dark:text-amber-450" />,
       imageUrl: '/images/cat_ms_pipes.jpg',
       href: '/products?category=MS+Pipes'
     },
@@ -35,7 +35,7 @@ export default function Home() {
       title: 'Roofing Sheets',
       desc: 'Premium color-coated profile sheets, polycarbonate sheets, and accessories for industrial sheds.',
       brands: 'Tata Bluescope, JSW Pragati',
-      icon: <Building2 className="h-5 w-5 text-blue-655 dark:text-blue-500" />,
+      icon: <Building2 className="h-5 w-5 text-amber-500 dark:text-amber-450" />,
       imageUrl: '/images/cat_roofing_sheets.jpg',
       href: '/products?category=Roofing+Sheets'
     },
@@ -43,7 +43,7 @@ export default function Home() {
       title: 'MS Angle & MS Flat',
       desc: 'Top quality Mild Steel structural Angles and flat iron bars for structural fabrication, grids, and frames.',
       brands: 'SAIL, VIZAG Steel, local high-grade mills',
-      icon: <Settings className="h-5 w-5 text-blue-655 dark:text-blue-500" />,
+      icon: <Settings className="h-5 w-5 text-amber-500 dark:text-amber-450" />,
       imageUrl: '/images/cat_ms_angle_flat.jpg',
       href: '/products?category=MS+Angle+%26+MS+Flat'
     },
@@ -51,7 +51,7 @@ export default function Home() {
       title: 'Structural Steel',
       desc: 'Heavy structural members including MS Angles, Channels, I-Beams, and flat sections.',
       brands: 'SAIL, Vizag Steel, local high-grade mills',
-      icon: <Award className="h-5 w-5 text-blue-655 dark:text-blue-500" />,
+      icon: <Award className="h-5 w-5 text-amber-500 dark:text-amber-450" />,
       imageUrl: '/images/cat_structural_steel.jpg',
       href: '/products?category=Structural+Steel'
     }
@@ -66,17 +66,17 @@ export default function Home() {
     {
       title: 'Authorized Dealerships',
       desc: 'Genuine materials sourced directly from Tata, Jindal, JSW, and SAIL mills.',
-      icon: <ShieldCheck className="h-8 w-8 text-blue-655 dark:text-blue-400" />
+      icon: <ShieldCheck className="h-8 w-8 text-amber-600 dark:text-amber-400" />
     },
     {
       title: 'Fast On-Site Delivery',
       desc: 'Dedicated transport fleet to deliver raw steel directly to your project site in Patna & Bihar.',
-      icon: <Truck className="h-8 w-8 text-blue-655 dark:text-blue-400" />
+      icon: <Truck className="h-8 w-8 text-amber-600 dark:text-amber-400" />
     },
     {
       title: 'Real-time Daily Rates',
       desc: 'Dynamic, fair pricing tailored to wholesale market rates for bulk procurement.',
-      icon: <Clock className="h-8 w-8 text-blue-655 dark:text-blue-400" />
+      icon: <Clock className="h-8 w-8 text-amber-600 dark:text-amber-400" />
     }
   ];
 
@@ -84,14 +84,14 @@ export default function Home() {
     <div className="flex flex-col transition-colors duration-300">
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-slate-205 dark:border-slate-900 pb-20 pt-24 sm:pb-28 sm:pt-32 lg:pb-32 lg:pt-40">
+      <section className="relative overflow-hidden border-b border-stone-200 dark:border-stone-900 pb-20 pt-24 sm:pb-28 sm:pt-32 lg:pb-32 lg:pt-40">
         
         {/* Subtle grid pattern background */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e1_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e1_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e1_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e1_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1c1917_1px,transparent_1px),linear-gradient(to_bottom,#1c1917_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
         
         {/* Radial decorative light */}
-        <div className="absolute -top-40 left-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-blue-500/5 dark:bg-blue-900/10 blur-[120px] pointer-events-none"></div>
-
+        <div className="absolute -top-40 left-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-amber-500/5 dark:bg-amber-950/10 blur-[120px] pointer-events-none"></div>
+ 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -99,15 +99,15 @@ export default function Home() {
             <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
               
               {/* Tagline */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-500/20 bg-blue-50/60 dark:bg-blue-950/30 px-4 py-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 backdrop-blur-md mb-6">
-                <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
+              <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 dark:border-amber-500/20 bg-amber-50/60 dark:bg-amber-950/30 px-4 py-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 backdrop-blur-md mb-6">
+                <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse"></span>
                 {"Patna's Premier Structural Steel Yard"}
               </div>
 
               {/* Main Headline */}
               <h1 className="max-w-xl text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-6xl leading-[1.1]">
                 Your Trusted Partner for <br />
-                <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 dark:from-blue-400 dark:via-blue-500 dark:to-indigo-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 dark:from-amber-400 dark:via-amber-500 dark:to-yellow-400 bg-clip-text text-transparent">
                   Premium Steel Products
                 </span> in Patna
               </h1>
@@ -121,7 +121,7 @@ export default function Home() {
               <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full max-w-md sm:max-w-none justify-center lg:justify-start">
                 <Link
                   href="/products"
-                  className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 py-4 font-bold text-white shadow-xl shadow-blue-600/10 dark:shadow-blue-600/20 transition-all duration-300 hover:bg-blue-500 hover:-translate-y-0.5"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-8 py-4 font-bold text-white shadow-xl shadow-amber-600/10 dark:shadow-amber-600/20 transition-all duration-300 hover:bg-amber-550 hover:-translate-y-0.5"
                 >
                   <span>View Product Catalog</span>
                   <ArrowRight size={18} />
@@ -180,7 +180,7 @@ export default function Home() {
             <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Our Core Categories</h2>
             <p className="mt-2 text-slate-600 dark:text-slate-400">Heavy-duty materials sourced from industry-leading mills</p>
           </div>
-          <Link href="/products" className="group mt-4 md:mt-0 flex items-center gap-1.5 text-sm font-bold text-blue-600 dark:text-blue-505 hover:text-blue-550 dark:hover:text-blue-400 transition-colors">
+          <Link href="/products" className="group mt-4 md:mt-0 flex items-center gap-1.5 text-sm font-bold text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors">
             <span>View all products</span>
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
           </Link>
@@ -208,7 +208,7 @@ export default function Home() {
 
               {/* Text details container */}
               <div className="flex flex-col flex-grow p-6">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                   {cat.title}
                 </h3>
                 <p className="mt-2 text-sm text-slate-650 dark:text-slate-400 leading-relaxed flex-grow">
@@ -244,10 +244,10 @@ export default function Home() {
 
       {/* Call to Action Quote Panel */}
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-slate-100 via-slate-50 to-blue-100/10 dark:from-slate-900 dark:via-slate-955 dark:to-blue-955/40 p-8 sm:p-12 md:p-16 shadow-xl dark:shadow-none">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-slate-100 via-slate-50 to-amber-100/10 dark:from-slate-900 dark:via-slate-950 dark:to-amber-955/20 p-8 sm:p-12 md:p-16 shadow-xl dark:shadow-none">
           
           {/* Background decoration */}
-          <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-blue-600/5 blur-[100px] pointer-events-none"></div>
+          <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-amber-600/5 blur-[100px] pointer-events-none"></div>
           
           <div className="relative max-w-3xl">
             <h2 className="text-3xl font-black text-slate-900 dark:text-white sm:text-4xl">
@@ -259,7 +259,7 @@ export default function Home() {
             <div className="mt-8 flex flex-wrap gap-4">
               <a
                 href={`tel:${phoneNumber}`}
-                className="inline-flex items-center gap-2.5 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 dark:shadow-blue-600/25 transition-all duration-300 hover:bg-blue-500"
+                className="inline-flex items-center gap-2.5 rounded-xl bg-amber-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-amber-600/20 dark:shadow-amber-600/25 transition-all duration-300 hover:bg-amber-500"
               >
                 <Phone size={16} />
                 <span>Call Sales Engineer</span>
