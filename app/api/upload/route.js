@@ -70,10 +70,15 @@ export async function POST(request) {
       );
     }
 
+    let finalUrl = result.secure_url;
+    if (resourceType === 'raw' && finalUrl && !finalUrl.toLowerCase().endsWith('.pdf')) {
+      finalUrl = finalUrl + '.pdf';
+    }
+
     // Return the permanent, secure URL of the uploaded image/PDF
     return NextResponse.json({
       success: true,
-      url: result.secure_url
+      url: finalUrl
     }, { status: 200 });
 
   } catch (error) {

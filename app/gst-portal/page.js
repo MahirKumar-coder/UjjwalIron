@@ -232,6 +232,9 @@ export default function GstPortal() {
       if (targetUrl && targetUrl.includes('image/upload') && targetUrl.toLowerCase().endsWith('.pdf')) {
         targetUrl = targetUrl.replace('image/upload', 'raw/upload');
       }
+      if (targetUrl && !targetUrl.toLowerCase().endsWith('.pdf')) {
+        targetUrl = targetUrl + '.pdf';
+      }
       window.open(targetUrl, '_blank');
 
       // 2. Log download action to server
