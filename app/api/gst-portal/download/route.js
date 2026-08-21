@@ -20,7 +20,7 @@ export async function POST(request) {
     }
 
     // ACTION: request-otp (sent for download verification if not already verified)
-    if (action === 'request-otp') {
+    if (action === 'request-otp' || action === 'send-otp') {
       if (!mobileNo || mobileNo.trim() !== customer.mobileNo) {
         return NextResponse.json({ success: false, error: 'Registered mobile number does not match.' }, { status: 400 });
       }

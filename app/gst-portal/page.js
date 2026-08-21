@@ -280,7 +280,7 @@ export default function GstPortal() {
                   value={mobileNo}
                   onChange={(e) => setMobileNo(e.target.value)}
                   placeholder="Enter Mobile No..."
-                  className="w-full rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-900 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
               </div>
 
@@ -402,7 +402,7 @@ export default function GstPortal() {
                     return (
                       <tr key={bill._id} className="hover:bg-stone-50 dark:hover:bg-stone-900/40 transition-colors">
                         <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{bill.billNo}</td>
-                        <td className="px-6 py-4 flex items-center gap-1.5"><Calendar size={14} className="text-stone-400" />{new Date(bill.billDate).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 text-stone-600 dark:text-stone-300 flex items-center gap-1.5"><Calendar size={14} className="text-stone-400 shrink-0" /><span>{new Date(bill.billDate).toLocaleDateString()}</span></td>
                         <td className="px-6 py-4 font-mono font-bold text-slate-900 dark:text-white">₹{bill.totalAmount.toFixed(2)}</td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end gap-3">
@@ -514,9 +514,9 @@ export default function GstPortal() {
                   <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed">
                     For security reasons, your first PDF download requires an OTP. A code will be delivered to your registered email address.
                   </p>
-                  <div className="rounded-xl bg-stone-50 dark:bg-stone-905 border border-stone-200 dark:border-stone-800 p-4 font-medium text-xs space-y-1 text-stone-600 dark:text-stone-300">
-                    <div>GSTIN: <span className="font-mono font-bold text-slate-950 dark:text-white">{customerInfo.gstNo}</span></div>
-                    <div>Registered Mobile: <span className="font-bold text-slate-950 dark:text-white">{customerInfo.mobileNo}</span></div>
+                  <div className="rounded-xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 p-4 font-medium text-xs space-y-1 text-stone-600 dark:text-stone-300">
+                    <div>GSTIN: <span className="font-mono font-bold text-slate-900 dark:text-white">{customerInfo.gstNo}</span></div>
+                    <div>Registered Mobile: <span className="font-bold text-slate-900 dark:text-white">{customerInfo.mobileNo}</span></div>
                   </div>
 
                   {downloadError && (
