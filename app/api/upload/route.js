@@ -41,10 +41,11 @@ export async function POST(request) {
     const cloudinaryFormData = new FormData();
     cloudinaryFormData.append('file', file);
     cloudinaryFormData.append('upload_preset', uploadPreset);
+    cloudinaryFormData.append('resource_type', 'auto');
 
-    // Call Cloudinary Upload Endpoint (using /auto/upload to support images and PDFs)
+    // Call Cloudinary Upload Endpoint (using auto detection to support images and PDFs)
     const cloudinaryResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
+      `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
       {
         method: 'POST',
         body: cloudinaryFormData,

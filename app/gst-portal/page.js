@@ -228,8 +228,11 @@ export default function GstPortal() {
   // Triggers PDF download in new tab
   const executePdfDownload = async (bill) => {
     try {
-      // 1. Open the Cloudinary secure PDF file link directly to download/view
-      window.open(bill.pdfUrl, '_blank');
+      let targetUrl = bill.pdfUrl;
+      if (targetUrl && targetUrl.includes('image/upload') && targetUrl.toLowerCase().endsWith('.pdf')) {
+        targetUrl = targetUrl.replace('image/upload', 'raw/upload');
+      }
+      window.open(targetUrl, '_blank');
 
       // 2. Log download action to server
       await fetch('/api/gst-portal/download', {
