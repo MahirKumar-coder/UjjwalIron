@@ -37,15 +37,19 @@ export async function POST(request) {
       );
     }
 
+    // Determine the correct Cloudinary resource type & endpoint based on file format
+    const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+    const resourceType = isPdf ? 'raw' : 'image';
+
     // Build the payload to forward to Cloudinary REST API
     const cloudinaryFormData = new FormData();
     cloudinaryFormData.append('file', file);
     cloudinaryFormData.append('upload_preset', uploadPreset);
-    cloudinaryFormData.append('resource_type', 'auto');
+    cloudinaryFormData.append('resource_type', resourceType);
 
-    // Call Cloudinary Upload Endpoint (using auto detection to support images and PDFs)
+    // Call Cloudinary Upload Endpoint (using the dedicated pipeline for images or raw documents)
     const cloudinaryResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+      `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
       {
         method: 'POST',
         body: cloudinaryFormData,
