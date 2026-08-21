@@ -47,18 +47,27 @@ export async function POST(request) {
 
     if (smtpHost && smtpPort && smtpUser && smtpPass) {
       try {
-        const transporter = nodemailer.createTransport({
-          host: smtpHost,
-          port: parseInt(smtpPort),
-          secure: parseInt(smtpPort) === 465,
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-          tls: {
-            rejectUnauthorized: false
-          }
-        });
+        const isGmail = smtpHost.toLowerCase().includes('gmail.com');
+        const transporter = isGmail
+          ? nodemailer.createTransport({
+              service: 'gmail',
+              auth: {
+                user: smtpUser,
+                pass: smtpPass,
+              },
+            })
+          : nodemailer.createTransport({
+              host: smtpHost,
+              port: parseInt(smtpPort),
+              secure: parseInt(smtpPort) === 465,
+              auth: {
+                user: smtpUser,
+                pass: smtpPass,
+              },
+              tls: {
+                rejectUnauthorized: false
+              }
+            });
 
         const mailOptions = {
           from: `"Ujjwal Iron GST Desk" <${smtpUser}>`,

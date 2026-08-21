@@ -53,6 +53,8 @@ export default function AdminPage() {
   });
 
   const [uploading, setUploading] = useState(false);
+  const [smtpTestLoading, setSmtpTestLoading] = useState(false);
+  const [smtpTestResult, setSmtpTestResult] = useState(null);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -142,6 +144,30 @@ export default function AdminPage() {
     setProducts([]);
     setInquiries([]);
     setPasscode('');
+  };
+
+  const handleTestSmtp = async () => {
+    setSmtpTestLoading(true);
+    setSmtpTestResult(null);
+    try {
+      const res = await fetch('/api/admin/test-smtp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': passcode,
+        },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSmtpTestResult({ success: true, message: data.message });
+      } else {
+        setSmtpTestResult({ success: false, error: data.error || 'Failed to dispatch test email.' });
+      }
+    } catch (err) {
+      setSmtpTestResult({ success: false, error: 'Network communication error.' });
+    } finally {
+      setSmtpTestLoading(false);
+    }
   };
 
   const fetchProducts = async () => {
@@ -843,7 +869,40 @@ We would like to share the latest wholesale rates and specifications. Let us kno
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             {/* Notifications Feed Column */}
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-5 space-y-6">
+              
+              {/* SMTP Diagnostic Utility Card */}
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">SMTP Mail Diagnostics</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Verify SMTP connections and send a real test mail to confirm configuration is correct in production.</p>
+                
+                {smtpTestResult && (
+                  <div className={`rounded-xl p-3.5 text-xs font-semibold mb-4 border ${
+                    smtpTestResult.success 
+                      ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-250/50 text-emerald-700 dark:text-emerald-400' 
+                      : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/30 text-rose-700 dark:text-rose-400'
+                  }`}>
+                    {smtpTestResult.success ? smtpTestResult.message : smtpTestResult.error}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleTestSmtp}
+                  disabled={smtpTestLoading}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg hover:bg-amber-500 disabled:opacity-50 transition-all duration-300"
+                >
+                  {smtpTestLoading ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      <span>Verifying SMTP Mail Server Connection...</span>
+                    </>
+                  ) : (
+                    <span>Test Mail Server Delivery</span>
+                  )}
+                </button>
+              </div>
+
+              {/* Live Notifications Feed */}
               <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 p-6 shadow-sm">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">Live Notifications Feed</h3>
