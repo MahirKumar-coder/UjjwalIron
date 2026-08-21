@@ -41,9 +41,14 @@ export async function POST(request) {
     const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
     const resourceType = isPdf ? 'raw' : 'image';
 
+    // Convert the File object to a Base64 Data URI to prevent binary transfer corruption
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64File = `data:${file.type || 'application/pdf'};base64,${buffer.toString('base64')}`;
+
     // Build the payload to forward to Cloudinary REST API
     const cloudinaryFormData = new FormData();
-    cloudinaryFormData.append('file', file);
+    cloudinaryFormData.append('file', base64File);
     cloudinaryFormData.append('upload_preset', uploadPreset);
     cloudinaryFormData.append('resource_type', resourceType);
 
