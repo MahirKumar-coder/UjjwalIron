@@ -412,6 +412,7 @@ export default function AdminPage() {
         totalAmount
       }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isQuotationFormOpen,
     quotationFormData.items,
@@ -1613,7 +1614,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                         ).length === 0 ? (
                           <tr>
                             <td colSpan="6" className="px-6 py-12 text-center text-slate-450 dark:text-slate-500">
-                              No quotations found. Click "+ Create Quotation" above to start.
+                              No quotations found. Click &quot;+ Create Quotation&quot; above to start.
                             </td>
                           </tr>
                         ) : (
