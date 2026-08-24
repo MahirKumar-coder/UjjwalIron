@@ -11,6 +11,9 @@ export const metadata = {
     'Ujjwal Iron is Patna\'s premier supplier of MS Pipes, MS Angles, MS Flats, Roofing Sheets, and GP Pipes. Authorized dealer of Tata Structura, Jindal Star, and SAIL. Get the latest steel rates today.',
   keywords:
     'Ujjwal Iron, Steel Supplier Patna, MS Pipes Patna, MS Angle Patna, MS Flat Patna, Tata Structura Patna, Jindal Star Patna, Roofing Sheets Bihar, Steel Dealer Patna',
+  icons: {
+    icon: '/images/logo.jpg',
+  },
 };
 
 export default function RootLayout({ children }) {

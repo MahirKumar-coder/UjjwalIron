@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Download, Lock, CheckCircle2, Shield, Calendar, RefreshCw, AlertCircle, Eye, LogOut } from 'lucide-react';
+import { Download, Lock, CheckCircle2, Shield, Calendar, RefreshCw, AlertCircle, Eye, LogOut, FileText, Smartphone } from 'lucide-react';
 
 export default function GstPortal() {
   // Login credentials
@@ -72,14 +72,14 @@ export default function GstPortal() {
         setOtpSent(true);
         setOtpSuccess(
           data.devOtp 
-            ? `[DEV Mode] Verification OTP sent: ${data.devOtp} (Sent to registered email)`
-            : 'OTP Sent successfully to your registered email address!'
+            ? `[Verification Code: ${data.devOtp}] sent to your registered email address.`
+            : 'Verification Code (OTP) sent to your registered email address!'
         );
       } else {
-        setOtpError(data.error || 'Failed to request code. Check registered details.');
+        setOtpError(data.error || 'Details do not match. Please verify your GSTIN or contact support.');
       }
     } catch (err) {
-      setOtpError('Connection error. Try again.');
+      setOtpError('Failed to connect to the server. Please check your internet connection.');
     } finally {
       setOtpLoading(false);
     }
@@ -103,10 +103,10 @@ export default function GstPortal() {
         setCustomerInfo(data.customer);
         sessionStorage.setItem('gst_customer', JSON.stringify(data.customer));
       } else {
-        setOtpError(data.error || 'Invalid OTP code.');
+        setOtpError(data.error || 'Incorrect code. Please check and try again.');
       }
     } catch (err) {
-      setOtpError('Connection error. Try again.');
+      setOtpError('Connection error. Please try again.');
     } finally {
       setOtpLoading(false);
     }
@@ -175,8 +175,8 @@ export default function GstPortal() {
         setDownloadOtpSent(true);
         setDownloadSuccess(
           data.devOtp
-            ? `[DEV Mode] Verification OTP: ${data.devOtp} (Sent to registered email)`
-            : 'OTP Sent successfully to your registered email address!'
+            ? `[Verification Code: ${data.devOtp}] sent to your registered email address.`
+            : 'OTP code sent successfully to your registered email address!'
         );
       } else {
         setDownloadError(data.error || 'Failed to dispatch code.');
@@ -216,7 +216,7 @@ export default function GstPortal() {
         // Execute download trigger
         executePdfDownload(pendingBillToDownload);
       } else {
-        setDownloadError(data.error || 'Invalid OTP code.');
+        setDownloadError(data.error || 'Invalid verification code.');
       }
     } catch (err) {
       setDownloadError('Connection error.');
@@ -237,7 +237,7 @@ export default function GstPortal() {
       }
       window.open(targetUrl, '_blank');
 
-      // 2. Log download action to server
+      // Log download action to server
       await fetch('/api/gst-portal/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -252,47 +252,74 @@ export default function GstPortal() {
     }
   };
 
+  // 1. LOGIN INTERFACE (Unauthenticated state)
   if (!isLoggedIn) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-stone-50 dark:bg-stone-950 px-4 transition-colors duration-300">
-        <div className="w-full max-w-md rounded-3xl border border-stone-200 dark:border-stone-900 bg-white dark:bg-stone-900/50 p-8 shadow-xl backdrop-blur-md">
-          <div className="flex flex-col items-center mb-6">
-            <div className="rounded-full bg-amber-600/10 dark:bg-amber-500/10 border border-amber-500/20 p-4 text-amber-600 dark:text-amber-500 mb-3">
-              <Shield size={32} />
+      <div className="flex min-h-screen flex-col items-center justify-center bg-stone-100 dark:bg-stone-950 px-4 py-12 transition-colors duration-300">
+        <div className="w-full max-w-lg rounded-3xl border-2 border-amber-500/20 bg-white dark:bg-stone-900 p-8 sm:p-10 shadow-2xl">
+          
+          {/* Header */}
+          <div className="flex flex-col items-center text-center mb-8 border-b-2 border-stone-150 dark:border-stone-850 pb-6">
+            <div className="rounded-full bg-amber-500/10 p-5 text-amber-600 dark:text-amber-500 mb-4 border border-amber-500/20">
+              <Shield size={40} className="stroke-[2.5]" />
             </div>
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white">Customer GST Portal</h1>
-            <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">Access tax invoices & download verified bills</p>
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white leading-tight">
+              Customer GST Portal
+            </h1>
+            <p className="text-amber-600 dark:text-amber-400 font-bold text-sm tracking-wide mt-1 uppercase">
+              उज्जवल आयरन ग्राहक बिल पोर्टल
+            </p>
+            <p className="text-base text-stone-500 dark:text-stone-400 mt-3 font-medium max-w-xs">
+              Easily view and download your tax invoices in one place.
+            </p>
           </div>
 
           {!otpSent ? (
-            <form onSubmit={handleSendOtp} className="space-y-4">
+            // Form Step 1: GSTIN & Mobile
+            <form onSubmit={handleSendOtp} className="space-y-6">
+              <div className="bg-amber-500/5 dark:bg-amber-500/5 rounded-2xl p-4 border border-amber-500/10 mb-4 text-xs text-amber-800 dark:text-amber-300 font-semibold space-y-1">
+                <p>💡 Hint / संकेत:</p>
+                <p>1. Enter your 15-character GSTIN number.</p>
+                <p>2. Enter your 10-digit registered mobile number.</p>
+              </div>
+
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Your GSTIN Number</label>
+                <label className="block text-sm font-extrabold text-stone-700 dark:text-stone-300 mb-2">
+                  1. Enter GSTIN (जीएसटी नंबर डालें)
+                </label>
                 <input
                   type="text"
                   required
                   value={gstNo}
                   onChange={(e) => setGstNo(e.target.value.toUpperCase())}
-                  placeholder="Enter GSTIN (e.g. 10AIAPR...)"
-                  className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  placeholder="e.g. 10AIAPR1234A1Z1"
+                  className="w-full text-base sm:text-lg font-bold rounded-2xl border-2 border-stone-300 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 px-5 py-4 text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Registered Mobile Number</label>
-                <input
-                  type="text"
-                  required
-                  value={mobileNo}
-                  onChange={(e) => setMobileNo(e.target.value)}
-                  placeholder="Enter Mobile No..."
-                  className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-                />
+                <label className="block text-sm font-extrabold text-stone-700 dark:text-stone-300 mb-2">
+                  2. Registered Mobile Number (मोबाइल नंबर)
+                </label>
+                <div className="relative">
+                  <Smartphone size={20} className="absolute left-4 top-4.5 text-stone-400" />
+                  <input
+                    type="text"
+                    required
+                    pattern="[0-9]*"
+                    inputMode="numeric"
+                    maxLength="10"
+                    value={mobileNo}
+                    onChange={(e) => setMobileNo(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="Enter 10 digit number..."
+                    className="w-full pl-12 pr-5 py-4 text-base sm:text-lg font-bold rounded-2xl border-2 border-stone-300 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                  />
+                </div>
               </div>
 
               {otpError && (
-                <div className="flex items-start gap-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 p-3 text-xs text-rose-600 font-bold">
-                  <AlertCircle size={16} className="shrink-0" />
+                <div className="flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 p-4 text-sm text-rose-700 dark:text-rose-455 font-bold">
+                  <AlertCircle size={18} className="shrink-0 mt-0.5" />
                   <span>{otpError}</span>
                 </div>
               )}
@@ -300,51 +327,60 @@ export default function GstPortal() {
               <button
                 type="submit"
                 disabled={otpLoading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg hover:bg-amber-500 disabled:opacity-50 transition-all duration-300"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-600 py-4.5 text-base sm:text-lg font-black text-white shadow-xl shadow-amber-600/20 hover:bg-amber-500 disabled:opacity-50 transition-all duration-350 active:scale-[0.98] cursor-pointer"
               >
-                {otpLoading ? <RefreshCw size={16} className="animate-spin" /> : <span>Request Verification OTP</span>}
+                {otpLoading ? (
+                  <RefreshCw size={20} className="animate-spin" />
+                ) : (
+                  <span>Request Login Code (ओटीपी भेजें)</span>
+                )}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50 p-3.5 text-xs text-emerald-700 dark:text-emerald-400">
+            // Form Step 2: Verify OTP
+            <form onSubmit={handleVerifyOtp} className="space-y-6">
+              <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-250/50 p-4 text-sm text-emerald-800 dark:text-emerald-400 font-bold">
                 <span>{otpSuccess}</span>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Enter 6-Digit OTP</label>
+                <label className="block text-sm font-extrabold text-stone-700 dark:text-stone-300 mb-2">
+                  Enter 6-Digit Code (6 अंकों का कोड दर्ज करें)
+                </label>
                 <input
                   type="text"
                   required
+                  pattern="[0-9]*"
+                  inputMode="numeric"
                   maxLength="6"
                   value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  placeholder="Enter OTP code..."
-                  className="w-full text-center tracking-widest font-mono text-lg rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ''))}
+                  placeholder="e.g. 123456"
+                  className="w-full text-center tracking-widest font-mono text-xl sm:text-2xl font-black rounded-2xl border-2 border-stone-300 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 px-5 py-4.5 text-slate-900 dark:text-slate-100 placeholder-stone-300 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                 />
               </div>
 
               {otpError && (
-                <div className="flex items-start gap-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 p-3 text-xs text-rose-600 font-bold">
-                  <AlertCircle size={16} className="shrink-0" />
+                <div className="flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 p-4 text-sm text-rose-700 dark:text-rose-455 font-bold">
+                  <AlertCircle size={18} className="shrink-0 mt-0.5" />
                   <span>{otpError}</span>
                 </div>
               )}
 
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="button"
                   onClick={() => setOtpSent(false)}
-                  className="flex-1 rounded-xl border border-stone-200 px-4 py-3 text-xs font-bold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                  className="flex-1 rounded-2xl border-2 border-stone-300 dark:border-stone-800 py-4 text-sm sm:text-base font-bold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors cursor-pointer"
                 >
-                  Back
+                  Go Back (पीछे जाएं)
                 </button>
                 <button
                   type="submit"
                   disabled={otpLoading}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-3 text-xs font-bold text-white hover:bg-amber-500 disabled:opacity-50 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-amber-600 py-4 text-sm sm:text-base font-black text-white hover:bg-amber-500 disabled:opacity-50 transition-colors cursor-pointer"
                 >
-                  {otpLoading ? <RefreshCw size={14} className="animate-spin" /> : <span>Verify Code</span>}
+                  {otpLoading ? <RefreshCw size={16} className="animate-spin" /> : <span>Verify Code (लॉगिन करें)</span>}
                 </button>
               </div>
             </form>
@@ -354,128 +390,191 @@ export default function GstPortal() {
     );
   }
 
+  // 2. MAIN PORTAL (Logged-in state)
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 py-12 transition-colors duration-300">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 py-10 transition-colors duration-300">
+      <div className="mx-auto max-w-5xl px-4">
         
-        {/* Dashboard Header Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-stone-200 dark:border-stone-900 pb-6 mb-8 gap-4">
+        {/* Welcome Header */}
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-amber-500/10 p-6 sm:p-8 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white">{customerInfo.name}</h1>
-            <p className="text-sm text-stone-500 mt-1 font-mono">GSTIN: {customerInfo.gstNo} | Email: {customerInfo.email}</p>
+            <p className="text-sm font-extrabold text-amber-600 dark:text-amber-450 uppercase tracking-wide">
+              Logged in successfully • ग्राहक पोर्टल
+            </p>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">
+              Welcome, {customerInfo.name}
+            </h1>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-stone-500 dark:text-stone-400 text-sm font-mono font-semibold">
+              <span>GSTIN: {customerInfo.gstNo}</span>
+              <span className="hidden sm:inline">•</span>
+              <span>Mobile: {customerInfo.mobileNo}</span>
+            </div>
           </div>
+          
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-4 py-2.5 text-xs font-bold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="flex items-center gap-2 rounded-2xl border-2 border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/10 px-5 py-3 text-sm sm:text-base font-black text-rose-600 dark:text-rose-400 hover:text-rose-500 transition-all cursor-pointer"
           >
-            <LogOut size={14} />
-            <span>Sign Out</span>
+            <LogOut size={18} className="stroke-[2.5]" />
+            <span>Sign Out (बाहर निकलें)</span>
           </button>
         </div>
 
         {/* GST Invoices Section */}
-        <div className="rounded-3xl border border-stone-200 dark:border-stone-900 bg-white dark:bg-stone-900/40 p-6 shadow-sm overflow-hidden">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Uploaded GST Bills</h2>
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-amber-500/10 p-6 sm:p-8 shadow-xl">
+          <div className="flex justify-between items-center mb-8 border-b-2 border-stone-100 dark:border-stone-850 pb-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                Your Uploaded Bills (आपके बिल सूची)
+              </h2>
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
+                Download verified PDF copies of your invoices.
+              </p>
+            </div>
+            
             <button
               onClick={fetchBills}
-              className="p-2 border border-stone-200 dark:border-stone-800 rounded-xl text-stone-500 hover:text-slate-900 dark:text-stone-300 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              disabled={billsLoading}
+              className="flex items-center gap-1.5 px-4 py-2.5 border-2 border-stone-200 dark:border-stone-800 rounded-2xl text-sm font-bold text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-950 transition-colors"
               title="Refresh Invoices"
             >
-              <RefreshCw size={14} className={billsLoading ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={`stroke-[2.5] ${billsLoading ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
             </button>
           </div>
 
           {billsLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <RefreshCw size={32} className="animate-spin text-stone-400" />
+            <div className="flex flex-col justify-center items-center py-24 gap-3">
+              <RefreshCw size={40} className="animate-spin text-amber-500 stroke-[2.5]" />
+              <p className="text-sm text-stone-500 font-bold">Loading your invoices...</p>
             </div>
           ) : bills.length === 0 ? (
-            <div className="text-center py-20 text-stone-500">No GST Invoices found under your GSTIN number.</div>
+            <div className="text-center py-20 bg-stone-50 dark:bg-stone-950 rounded-2xl border-2 border-dashed border-stone-200 dark:border-stone-850">
+              <FileText className="h-16 w-16 text-stone-300 dark:text-stone-800 mx-auto mb-3" />
+              <p className="text-lg font-black text-stone-700 dark:text-stone-300">No GST Invoices Found</p>
+              <p className="text-sm text-stone-500 mt-1">If you made a recent purchase, please allow 24-48 hours for upload.</p>
+            </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-stone-50 dark:bg-stone-900 text-stone-500 text-xs font-bold uppercase tracking-wider">
-                  <tr>
-                    <th className="px-6 py-3 rounded-l-xl">Bill No</th>
-                    <th className="px-6 py-3">Date</th>
-                    <th className="px-6 py-3">Total Amount</th>
-                    <th className="px-6 py-3 rounded-r-xl text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100 dark:divide-stone-900">
-                  {bills.map((bill) => {
-                    return (
-                      <tr key={bill._id} className="hover:bg-stone-50 dark:hover:bg-stone-900/40 transition-colors">
-                        <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{bill.billNo}</td>
-                        <td className="px-6 py-4 text-stone-600 dark:text-stone-300 flex items-center gap-1.5"><Calendar size={14} className="text-stone-400 shrink-0" /><span>{new Date(bill.billDate).toLocaleDateString()}</span></td>
-                        <td className="px-6 py-4 font-mono font-bold text-slate-900 dark:text-white">₹{bill.totalAmount.toFixed(2)}</td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex justify-end gap-3">
-                            <button
-                              onClick={() => setSelectedBill(bill)}
-                              className="text-stone-500 hover:text-slate-900 dark:text-stone-300 dark:hover:text-white text-xs font-bold flex items-center gap-1 transition-colors"
-                            >
-                              <Eye size={14} />
-                              <span>View Details</span>
-                            </button>
-                            <button
-                              onClick={() => handleDownloadClick(bill)}
-                              className="text-amber-600 hover:text-amber-500 text-xs font-bold flex items-center gap-1 transition-colors"
-                            >
-                              <Download size={14} />
-                              <span>Download PDF</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            // Minimal Stacked Card Layout for Easy Reading & Tap (Elderly-Friendly)
+            <div className="space-y-4">
+              {bills.map((bill) => (
+                <div 
+                  key={bill._id} 
+                  className="bg-stone-50 dark:bg-stone-950/40 hover:bg-stone-100/50 dark:hover:bg-stone-950 border-2 border-stone-200/80 dark:border-stone-850 rounded-2xl p-5 sm:p-6 transition-all shadow-sm"
+                >
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    {/* Bill Info */}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-amber-600 dark:text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-lg border border-amber-500/20">
+                          Invoice (बिल)
+                        </span>
+                        <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+                          #{bill.billNo}
+                        </h3>
+                      </div>
+                      
+                      <div className="flex items-center gap-1.5 text-stone-500 dark:text-stone-400 text-sm font-medium">
+                        <Calendar size={16} />
+                        <span>Date: {new Date(bill.billDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                      </div>
+                    </div>
+
+                    {/* Amount & CTA Row */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-stone-200 dark:border-stone-850">
+                      
+                      {/* Price display */}
+                      <div className="flex flex-col sm:text-right pr-4">
+                        <span className="text-xs text-stone-450 dark:text-stone-500 uppercase font-bold tracking-wide">Total Amount</span>
+                        <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono">
+                          ₹{bill.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+
+                      {/* Download Button */}
+                      <button
+                        onClick={() => handleDownloadClick(bill)}
+                        className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-500 text-white font-black px-6 py-4.5 rounded-2xl shadow-lg shadow-amber-600/15 hover:shadow-amber-500/25 transition-all text-base cursor-pointer"
+                      >
+                        <Download size={20} className="stroke-[2.5]" />
+                        <span>Download PDF (डाउनलोड करें)</span>
+                      </button>
+
+                      {/* View details */}
+                      <button
+                        onClick={() => setSelectedBill(bill)}
+                        className="flex items-center justify-center gap-1.5 text-stone-600 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white px-4 py-3 rounded-xl border-2 border-stone-200 dark:border-stone-850 hover:bg-stone-50 dark:hover:bg-stone-900/60 transition-colors text-sm font-bold cursor-pointer"
+                      >
+                        <Eye size={16} />
+                        <span>View items</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        {/* MODAL 1: VIEW BILL DETAILS */}
+        {/* MODAL 1: SIMPLE BILL DETAILS VIEW */}
         {selectedBill && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4">
-            <div className="w-full max-w-md rounded-3xl border border-stone-200 dark:border-stone-900 bg-white dark:bg-stone-900 p-6 sm:p-8 shadow-xl">
-              <div className="flex justify-between items-start border-b border-stone-200 dark:border-stone-800 pb-4 mb-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/70 backdrop-blur-sm p-4">
+            <div className="w-full max-w-lg rounded-3xl border-2 border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-6 sm:p-8 shadow-2xl">
+              
+              {/* Header */}
+              <div className="flex justify-between items-start border-b-2 border-stone-100 dark:border-stone-800 pb-4 mb-6">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Tax Invoice Details</h3>
-                  <p className="text-xs text-stone-500 mt-1">Invoice Number: {selectedBill.billNo}</p>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Tax Invoice Details</h3>
+                  <p className="text-sm font-bold text-amber-600 dark:text-amber-550 mt-1">Invoice Number: {selectedBill.billNo}</p>
                 </div>
                 <button
                   onClick={() => setSelectedBill(null)}
-                  className="text-stone-400 hover:text-slate-900 dark:hover:text-white text-sm font-bold font-mono"
+                  className="rounded-xl border border-stone-300 dark:border-stone-750 px-3 py-1 text-base font-bold text-stone-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                 >
                   Close &times;
                 </button>
               </div>
 
-              <div className="space-y-4 text-sm text-stone-700 dark:text-stone-300">
-                <div className="flex justify-between">
-                  <span className="text-stone-400">Billed To:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">{selectedBill.customerName}</span>
+              {/* Customer info & bill items details */}
+              <div className="space-y-4 text-base text-stone-700 dark:text-stone-300">
+                <div className="flex justify-between border-b border-stone-100 dark:border-stone-850 pb-2">
+                  <span className="text-stone-450">Billed To:</span>
+                  <span className="font-extrabold text-slate-900 dark:text-white">{selectedBill.customerName}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-stone-400">GSTIN:</span>
-                  <span className="font-mono font-semibold">{selectedBill.gstNo}</span>
+                <div className="flex justify-between border-b border-stone-100 dark:border-stone-850 pb-2">
+                  <span className="text-stone-450">GSTIN:</span>
+                  <span className="font-mono font-bold text-slate-900 dark:text-white">{selectedBill.gstNo}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-stone-400">Invoice Date:</span>
-                  <span>{new Date(selectedBill.billDate).toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between border-t border-stone-200 dark:border-stone-850 pt-3 text-base font-bold">
-                  <span className="text-slate-900 dark:text-white">Grand Total Amount:</span>
-                  <span className="font-mono text-amber-600 dark:text-amber-400">₹{selectedBill.totalAmount.toFixed(2)}</span>
+                <div className="flex justify-between border-b border-stone-100 dark:border-stone-850 pb-2">
+                  <span className="text-stone-450">Invoice Date:</span>
+                  <span className="font-bold">{new Date(selectedBill.billDate).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</span>
                 </div>
 
-                <div className="pt-4 border-t border-stone-200 dark:border-stone-850 flex justify-end gap-3">
+                {/* Items Summary list */}
+                <div className="pt-2">
+                  <span className="text-stone-450 text-sm font-bold block mb-2">Purchased Items:</span>
+                  <div className="bg-stone-50 dark:bg-stone-950 p-3 rounded-xl border border-stone-200 dark:border-stone-850 space-y-2 text-sm font-semibold max-h-[140px] overflow-y-auto">
+                    {selectedBill.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-stone-605 dark:text-stone-350">
+                        <span>• {item.name} <span className="text-stone-400 font-normal">({item.qty} pcs)</span></span>
+                        <span className="font-mono">₹{(item.total || (item.qty * item.rate)).toLocaleString('en-IN')}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-between border-t-2 border-stone-100 dark:border-stone-850 pt-4 text-lg font-black">
+                  <span className="text-slate-900 dark:text-white">Total Bill Amount:</span>
+                  <span className="font-mono text-amber-600 dark:text-amber-400">
+                    ₹{selectedBill.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+
+                {/* Actions */}
+                <div className="pt-6 border-t-2 border-stone-100 dark:border-stone-800 flex justify-end gap-3">
                   <button
                     onClick={() => setSelectedBill(null)}
-                    className="px-4 py-2 border border-stone-200 dark:border-stone-800 rounded-xl text-xs font-bold hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                    className="px-5 py-3 border-2 border-stone-200 dark:border-stone-800 rounded-xl text-sm font-bold hover:bg-stone-50 dark:hover:bg-stone-950 transition-colors cursor-pointer"
                   >
                     Close View
                   </button>
@@ -484,9 +583,9 @@ export default function GstPortal() {
                       setSelectedBill(null);
                       handleDownloadClick(selectedBill);
                     }}
-                    className="px-4 py-2 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-500 transition-colors"
+                    className="px-5 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-sm font-black hover:shadow-lg transition-colors cursor-pointer"
                   >
-                    Download Invoice
+                    Download Invoice PDF
                   </button>
                 </div>
               </div>
@@ -496,12 +595,13 @@ export default function GstPortal() {
 
         {/* MODAL 2: DOWNLOAD PDF FIRST TIME OTP VERIFICATION */}
         {showVerifyDownloadModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4">
-            <div className="w-full max-w-md rounded-3xl border border-stone-200 dark:border-stone-900 bg-white dark:bg-stone-900 p-6 sm:p-8 shadow-xl">
-              <div className="flex justify-between items-start mb-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/70 backdrop-blur-sm p-4">
+            <div className="w-full max-w-lg rounded-3xl border-2 border-amber-550/20 bg-white dark:bg-stone-900 p-8 shadow-2xl">
+              
+              <div className="flex justify-between items-start mb-6 border-b border-stone-150 dark:border-stone-800 pb-3">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Security Verification</h3>
-                  <p className="text-xs text-stone-500 mt-1">Please authorize your first invoice download</p>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">Security Check</h3>
+                  <p className="text-sm font-bold text-amber-600 dark:text-amber-500 mt-0.5">Please authorize this download</p>
                 </div>
                 <button
                   onClick={() => {
@@ -509,25 +609,26 @@ export default function GstPortal() {
                     setDownloadOtp('');
                     setDownloadOtpSent(false);
                   }}
-                  className="text-stone-400 hover:text-slate-900 dark:hover:text-white text-sm font-bold"
+                  className="rounded-xl border border-stone-300 dark:border-stone-750 px-3 py-1 text-base font-bold text-stone-550 cursor-pointer"
                 >
-                  Close &times;
+                  &times;
                 </button>
               </div>
 
               {!downloadOtpSent ? (
-                <div className="space-y-4">
-                  <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed">
-                    For security reasons, your first PDF download requires an OTP. A code will be delivered to your registered email address.
+                <div className="space-y-6">
+                  <p className="text-base text-stone-600 dark:text-stone-350 leading-relaxed font-semibold">
+                    For your account security, your first PDF bill download requires email authorization. An OTP code will be sent to your registered email address.
                   </p>
-                  <div className="rounded-xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 p-4 font-medium text-xs space-y-1 text-stone-600 dark:text-stone-300">
-                    <div>GSTIN: <span className="font-mono font-bold text-slate-900 dark:text-white">{customerInfo.gstNo}</span></div>
-                    <div>Registered Mobile: <span className="font-bold text-slate-900 dark:text-white">{customerInfo.mobileNo}</span></div>
+                  
+                  <div className="rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-850 p-4 font-bold text-sm space-y-2 text-stone-700 dark:text-stone-300">
+                    <div>GSTIN: <span className="font-mono text-slate-900 dark:text-white">{customerInfo.gstNo}</span></div>
+                    <div>Registered Mobile: <span className="text-slate-900 dark:text-white">{customerInfo.mobileNo}</span></div>
                   </div>
 
                   {downloadError && (
-                    <div className="flex items-start gap-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/30 p-3 text-xs text-rose-600">
-                      <AlertCircle size={14} className="shrink-0" />
+                    <div className="flex items-start gap-2.5 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 p-4 text-sm text-rose-700 font-bold">
+                      <AlertCircle size={16} className="shrink-0 mt-0.5" />
                       <span>{downloadError}</span>
                     </div>
                   )}
@@ -535,51 +636,55 @@ export default function GstPortal() {
                   <button
                     onClick={handleSendDownloadOtp}
                     disabled={downloadOtpLoading}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-3 text-sm font-bold text-white hover:bg-amber-500 disabled:opacity-50 transition-colors"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-600 py-4 text-base font-black text-white hover:bg-amber-500 disabled:opacity-50 transition-colors cursor-pointer"
                   >
-                    {downloadOtpLoading ? <RefreshCw size={16} className="animate-spin" /> : <span>Send Verification OTP</span>}
+                    {downloadOtpLoading ? <RefreshCw size={18} className="animate-spin" /> : <span>Send OTP to Email (ओटीपी भेजें)</span>}
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleVerifyDownloadOtp} className="space-y-4">
-                  <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-250/50 p-3 text-xs text-emerald-700">
+                <form onSubmit={handleVerifyDownloadOtp} className="space-y-6">
+                  <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-250/50 p-4 text-sm text-emerald-800 dark:text-emerald-450 font-bold">
                     <span>{downloadSuccess}</span>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Enter 6-Digit OTP</label>
+                    <label className="block text-sm font-extrabold text-stone-750 dark:text-stone-300 mb-2">
+                      Enter the 6-Digit Email OTP
+                    </label>
                     <input
                       type="text"
                       required
+                      pattern="[0-9]*"
+                      inputMode="numeric"
                       maxLength="6"
                       value={downloadOtp}
-                      onChange={(e) => setDownloadOtp(e.target.value)}
+                      onChange={(e) => setDownloadOtp(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder="e.g. 123456"
-                      className="w-full text-center tracking-widest font-mono text-lg rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
+                      className="w-full text-center tracking-widest font-mono text-xl sm:text-2xl font-black rounded-2xl border-2 border-stone-300 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 px-5 py-4 text-slate-900 dark:text-slate-100 placeholder-stone-300 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
 
                   {downloadError && (
-                    <div className="flex items-start gap-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/30 p-3 text-xs text-rose-600">
-                      <AlertCircle size={14} className="shrink-0" />
+                    <div className="flex items-start gap-2.5 rounded-2xl bg-rose-50 dark:bg-rose-955/20 border border-rose-200 dark:border-rose-900/30 p-4 text-sm text-rose-700 font-bold">
+                      <AlertCircle size={16} className="shrink-0 mt-0.5" />
                       <span>{downloadError}</span>
                     </div>
                   )}
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       type="button"
                       onClick={() => setDownloadOtpSent(false)}
-                      className="flex-1 rounded-xl border border-stone-200 px-4 py-3 text-xs font-bold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                      className="flex-1 rounded-2xl border-2 border-stone-300 dark:border-stone-800 py-4 text-sm sm:text-base font-bold text-stone-600 dark:text-stone-350 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors cursor-pointer"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
                       disabled={downloadOtpLoading}
-                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-3 text-xs font-bold text-white hover:bg-amber-500 disabled:opacity-50 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-amber-600 py-4 text-sm sm:text-base font-black text-white hover:bg-amber-500 disabled:opacity-50 transition-colors cursor-pointer"
                     >
-                      {downloadOtpLoading ? <RefreshCw size={14} className="animate-spin" /> : <span>Verify & Download</span>}
+                      {downloadOtpLoading ? <RefreshCw size={14} className="animate-spin" /> : <span>Verify & Download (डाउनलोड करें)</span>}
                     </button>
                   </div>
                 </form>

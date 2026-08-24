@@ -17,7 +17,9 @@ import {
   MessageSquare, 
   Phone, 
   Inbox, 
-  RefreshCw
+  RefreshCw,
+  Download,
+  FileSpreadsheet
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -29,6 +31,32 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('products'); // 'products', 'inquiries', or 'gst'
   const [gstBills, setGstBills] = useState([]);
   const [notifications, setNotifications] = useState([]);
+
+  // Quotation states
+  const [quotations, setQuotations] = useState([]);
+  const [isQuotationFormOpen, setIsQuotationFormOpen] = useState(false);
+  const [editingQuotationId, setEditingQuotationId] = useState(null);
+  const [quotationSearchQuery, setQuotationSearchQuery] = useState('');
+  const [quotationFormData, setQuotationFormData] = useState({
+    quotationNo: '',
+    customerName: '',
+    phone: '',
+    email: '',
+    address: '',
+    gstNo: '',
+    date: '',
+    validityDays: 7,
+    items: [{ name: '', brand: '', specification: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+    cgst: 9,
+    sgst: 9,
+    igst: 0,
+    loadingCharges: 0,
+    transportCharges: 0,
+    subtotal: 0,
+    totalTax: 0,
+    totalAmount: 0,
+    terms: `1. Prices are valid for 7 days.\n2. 100% advance payment before delivery.\n3. Loading & transportation charges extra as applicable.\n4. Goods once sold will not be returned.\n5. All disputes subject to Patna jurisdiction.`
+  });
   
   // Search and Filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -121,6 +149,7 @@ export default function AdminPage() {
         fetchInquiries(passToVerify);
         fetchGstBills(passToVerify);
         fetchNotifications(passToVerify);
+        fetchQuotations(passToVerify);
       } else {
         setAuthError(result.error || 'Authentication failed.');
         sessionStorage.removeItem('admin_pass');
@@ -143,7 +172,508 @@ export default function AdminPage() {
     setIsAuth(false);
     setProducts([]);
     setInquiries([]);
+    setQuotations([]);
     setPasscode('');
+  };
+
+  // Quotation Management Handlers
+  const fetchQuotations = async (pass = passcode) => {
+    setActionLoading(true);
+    try {
+      const response = await fetch('/api/quotations', {
+        headers: {
+          'x-admin-password': pass,
+        },
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setQuotations(result.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch quotations', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const generateQuotationNo = () => {
+    const today = new Date();
+    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    return `Q-${dateStr}-${rand}`;
+  };
+
+  const openCreateQuotation = () => {
+    setEditingQuotationId(null);
+    setQuotationFormData({
+      quotationNo: generateQuotationNo(),
+      customerName: '',
+      phone: '',
+      email: '',
+      address: '',
+      gstNo: '',
+      date: new Date().toISOString().slice(0, 10),
+      validityDays: 7,
+      items: [{ name: '', brand: '', specification: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+      cgst: 9,
+      sgst: 9,
+      igst: 0,
+      loadingCharges: 0,
+      transportCharges: 0,
+      subtotal: 0,
+      totalTax: 0,
+      totalAmount: 0,
+      terms: `1. Prices are valid for 7 days.\n2. 100% advance payment before delivery.\n3. Loading & transportation charges extra as applicable.\n4. Goods once sold will not be returned.\n5. All disputes subject to Patna jurisdiction.`
+    });
+    setIsQuotationFormOpen(true);
+  };
+
+  const openEditQuotation = (quote) => {
+    setEditingQuotationId(quote._id);
+    setQuotationFormData({
+      quotationNo: quote.quotationNo,
+      customerName: quote.customerName,
+      phone: quote.phone,
+      email: quote.email || '',
+      address: quote.address || '',
+      gstNo: quote.gstNo || '',
+      date: new Date(quote.date).toISOString().slice(0, 10),
+      validityDays: quote.validityDays || 7,
+      items: quote.items.map(item => ({
+        name: item.name,
+        brand: item.brand || '',
+        specification: item.specification || '',
+        qty: item.qty,
+        unit: item.unit || 'Pcs',
+        rate: item.rate,
+        total: item.total
+      })),
+      cgst: quote.cgst || 0,
+      sgst: quote.sgst || 0,
+      igst: quote.igst || 0,
+      loadingCharges: quote.loadingCharges || 0,
+      transportCharges: quote.transportCharges || 0,
+      subtotal: quote.subtotal,
+      totalTax: quote.totalTax,
+      totalAmount: quote.totalAmount,
+      terms: quote.terms || ''
+    });
+    setIsQuotationFormOpen(true);
+  };
+
+  const handleQuotationFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const url = editingQuotationId ? `/api/quotations/${editingQuotationId}` : '/api/quotations';
+    const method = editingQuotationId ? 'PUT' : 'POST';
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': passcode,
+        },
+        body: JSON.stringify(quotationFormData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setIsQuotationFormOpen(false);
+        setEditingQuotationId(null);
+        fetchQuotations();
+      } else {
+        alert(result.error || 'Failed to save quotation.');
+      }
+    } catch (err) {
+      alert('A network error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteQuotation = async (id) => {
+    if (!confirm('Are you sure you want to permanently delete this quotation?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/quotations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'x-admin-password': passcode,
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        fetchQuotations();
+      } else {
+        alert(result.error || 'Failed to delete quotation.');
+      }
+    } catch (err) {
+      alert('A network error occurred.');
+    }
+  };
+
+  // Quotation Item Operations
+  const addQuotationItemRow = () => {
+    setQuotationFormData(prev => ({
+      ...prev,
+      items: [...prev.items, { name: '', brand: '', specification: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }]
+    }));
+  };
+
+  const removeQuotationItemRow = (index) => {
+    if (quotationFormData.items.length === 1) return;
+    setQuotationFormData(prev => ({
+      ...prev,
+      items: prev.items.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleQuotationItemChange = (index, field, value) => {
+    const updatedItems = [...quotationFormData.items];
+    updatedItems[index][field] = field === 'qty' || field === 'rate' ? Number(value) : value;
+    updatedItems[index].total = updatedItems[index].qty * updatedItems[index].rate;
+    setQuotationFormData(prev => ({
+      ...prev,
+      items: updatedItems
+    }));
+  };
+
+  const handleProductSelect = (index, prodId) => {
+    const prod = products.find(p => p._id === prodId);
+    if (!prod) return;
+
+    const updatedItems = [...quotationFormData.items];
+    updatedItems[index].name = prod.name;
+    updatedItems[index].brand = prod.brand;
+    const specText = prod.specifications && prod.specifications.length > 0
+      ? prod.specifications.map(s => `${s.key}: ${s.value}`).join(', ')
+      : '';
+    updatedItems[index].specification = specText;
+    
+    let estRate = 0;
+    if (prod.price && prod.price !== 'On Request') {
+      const match = prod.price.match(/\d+[\d,.]*/);
+      if (match) {
+        estRate = parseFloat(match[0].replace(/,/g, ''));
+      }
+    }
+    updatedItems[index].rate = estRate;
+    updatedItems[index].total = estRate * updatedItems[index].qty;
+
+    setQuotationFormData(prev => ({
+      ...prev,
+      items: updatedItems
+    }));
+  };
+
+  // Calculations useEffect
+  useEffect(() => {
+    if (!isQuotationFormOpen) return;
+    
+    const updatedItems = quotationFormData.items.map(item => {
+      const total = Number(item.qty || 0) * Number(item.rate || 0);
+      return { ...item, total };
+    });
+
+    const subtotal = updatedItems.reduce((acc, item) => acc + item.total, 0);
+
+    const cgstPct = Number(quotationFormData.cgst || 0);
+    const sgstPct = Number(quotationFormData.sgst || 0);
+    const igstPct = Number(quotationFormData.igst || 0);
+
+    const cgstAmt = (subtotal * cgstPct) / 100;
+    const sgstAmt = (subtotal * sgstPct) / 100;
+    const igstAmt = (subtotal * igstPct) / 100;
+    const totalTax = cgstAmt + sgstAmt + igstAmt;
+
+    const loading = Number(quotationFormData.loadingCharges || 0);
+    const transport = Number(quotationFormData.transportCharges || 0);
+
+    const totalAmount = subtotal + totalTax + loading + transport;
+
+    if (
+      JSON.stringify(updatedItems) !== JSON.stringify(quotationFormData.items) ||
+      subtotal !== quotationFormData.subtotal ||
+      totalTax !== quotationFormData.totalTax ||
+      totalAmount !== quotationFormData.totalAmount
+    ) {
+      setQuotationFormData(prev => ({
+        ...prev,
+        items: updatedItems,
+        subtotal,
+        totalTax,
+        totalAmount
+      }));
+    }
+  }, [
+    isQuotationFormOpen,
+    quotationFormData.items,
+    quotationFormData.cgst,
+    quotationFormData.sgst,
+    quotationFormData.igst,
+    quotationFormData.loadingCharges,
+    quotationFormData.transportCharges
+  ]);
+
+  // PDF Export logic
+  const handleDownloadQuotationPdf = async (quote) => {
+    try {
+      let logoBase64 = null;
+      try {
+        const logoRes = await fetch('/images/logo.jpg');
+        const logoBlob = await logoRes.blob();
+        logoBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(logoBlob);
+        });
+      } catch (err) {
+        console.error('Failed to load logo for PDF', err);
+      }
+
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF('p', 'mm', 'a4'); // A4 size: 210 x 297 mm
+
+      const leftMargin = 15;
+      const rightMargin = 195;
+      let currentY = 15;
+
+      // Draw Letterhead Header
+      if (logoBase64) {
+        doc.addImage(logoBase64, 'JPEG', leftMargin, currentY, 22, 22);
+      }
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.setTextColor(15, 23, 42); // slate-900
+      doc.text('UJJWAL IRON', 42, currentY + 6);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(71, 85, 105); // slate-600
+      doc.text('Dealers in MS Pipes, MS Angles, MS Flats, GP Pipes & Roofing Sheets', 42, currentY + 11);
+      doc.text('Address: Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011', 42, currentY + 16);
+      doc.text('Mobile: +91 8986043632 | Email: sales@ujjwaliron.com', 42, currentY + 21);
+
+      currentY += 26;
+      doc.setDrawColor(203, 213, 225); // slate-300
+      doc.setLineWidth(0.5);
+      doc.line(leftMargin, currentY, rightMargin, currentY);
+
+      // Title
+      currentY += 10;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(217, 119, 6); // amber-600
+      doc.text('QUOTATION', 105, currentY, { align: 'center' });
+
+      // Customer Info Box vs Quotation Info
+      currentY += 12;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42); // slate-900
+      doc.text('QUOTATION TO:', leftMargin, currentY);
+      doc.text('QUOTATION DETAILS:', 125, currentY);
+
+      currentY += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text(quote.customerName, leftMargin, currentY);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(51, 65, 85); // slate-700
+      doc.text(`Quotation No: ${quote.quotationNo}`, 125, currentY);
+
+      currentY += 5;
+      doc.text(`Phone: +91 ${quote.phone}`, leftMargin, currentY);
+      doc.text(`Date: ${new Date(quote.date).toLocaleDateString('en-IN')}`, 125, currentY);
+
+      currentY += 5;
+      if (quote.email) {
+        doc.text(`Email: ${quote.email}`, leftMargin, currentY);
+      } else {
+        doc.text('Email: N/A', leftMargin, currentY);
+      }
+      doc.text(`Validity: ${quote.validityDays} Days`, 125, currentY);
+
+      currentY += 5;
+      if (quote.gstNo) {
+        doc.text(`GSTIN: ${quote.gstNo.toUpperCase()}`, leftMargin, currentY);
+      }
+      if (quote.address) {
+        doc.text(`Delivery: ${quote.address}`, leftMargin, currentY + (quote.gstNo ? 5 : 0));
+      }
+
+      currentY += (quote.gstNo || quote.address) ? 15 : 8;
+
+      // Draw Items Table Headers
+      doc.setFillColor(241, 245, 249); // slate-100 background
+      doc.rect(leftMargin, currentY, 180, 8, 'F');
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42); // slate-900
+
+      // columns: S.No, Description, Brand, Specification, Qty, Unit, Rate, Total
+      doc.text('S.No', leftMargin + 2, currentY + 5.5);
+      doc.text('Material Description', leftMargin + 12, currentY + 5.5);
+      doc.text('Brand', leftMargin + 77, currentY + 5.5);
+      doc.text('Specification', leftMargin + 102, currentY + 5.5);
+      doc.text('Qty', leftMargin + 136, currentY + 5.5, { align: 'right' });
+      doc.text('Unit', leftMargin + 138, currentY + 5.5);
+      doc.text('Rate', leftMargin + 164, currentY + 5.5, { align: 'right' });
+      doc.text('Total (Rs)', rightMargin - 1, currentY + 5.5, { align: 'right' });
+
+      currentY += 8;
+
+      // Table Rows
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(51, 65, 85); // slate-700
+      
+      quote.items.forEach((item, index) => {
+        if (currentY > 240) {
+          doc.addPage();
+          currentY = 20;
+          
+          doc.setFillColor(241, 245, 249);
+          doc.rect(leftMargin, currentY, 180, 8, 'F');
+          doc.setFont('helvetica', 'bold');
+          doc.text('S.No', leftMargin + 2, currentY + 5.5);
+          doc.text('Material Description', leftMargin + 12, currentY + 5.5);
+          doc.text('Brand', leftMargin + 77, currentY + 5.5);
+          doc.text('Specification', leftMargin + 102, currentY + 5.5);
+          doc.text('Qty', leftMargin + 136, currentY + 5.5, { align: 'right' });
+          doc.text('Unit', leftMargin + 138, currentY + 5.5);
+          doc.text('Rate', leftMargin + 164, currentY + 5.5, { align: 'right' });
+          doc.text('Total (Rs)', rightMargin - 1, currentY + 5.5, { align: 'right' });
+          currentY += 8;
+          doc.setFont('helvetica', 'normal');
+        }
+
+        doc.text(String(index + 1), leftMargin + 2, currentY + 5.5);
+        
+        const itemName = item.name.length > 32 ? item.name.substring(0, 30) + '...' : item.name;
+        doc.text(itemName, leftMargin + 12, currentY + 5.5);
+        
+        doc.text(item.brand || '-', leftMargin + 77, currentY + 5.5);
+        doc.text(item.specification || '-', leftMargin + 102, currentY + 5.5);
+        doc.text(String(item.qty), leftMargin + 136, currentY + 5.5, { align: 'right' });
+        doc.text(item.unit || 'Pcs', leftMargin + 138, currentY + 5.5);
+        doc.text(item.rate.toFixed(2), leftMargin + 164, currentY + 5.5, { align: 'right' });
+        doc.text((item.qty * item.rate).toFixed(2), rightMargin - 1, currentY + 5.5, { align: 'right' });
+
+        doc.setDrawColor(241, 245, 249);
+        doc.line(leftMargin, currentY + 8, rightMargin, currentY + 8);
+
+        currentY += 8;
+      });
+
+      currentY += 5;
+
+      if (currentY > 220) {
+        doc.addPage();
+        currentY = 20;
+      }
+
+      const summaryStartX = 120;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(71, 85, 105);
+
+      // Subtotal
+      doc.text('Subtotal:', summaryStartX, currentY);
+      doc.text(`Rs. ${quote.subtotal.toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
+      currentY += 5;
+
+      // Taxes (CGST / SGST / IGST)
+      if (quote.cgst > 0) {
+        doc.text(`CGST (${quote.cgst}%):`, summaryStartX, currentY);
+        doc.text(`Rs. ${((quote.subtotal * quote.cgst) / 100).toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
+        currentY += 5;
+      }
+      if (quote.sgst > 0) {
+        doc.text(`SGST (${quote.sgst}%):`, summaryStartX, currentY);
+        doc.text(`Rs. ${((quote.subtotal * quote.sgst) / 100).toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
+        currentY += 5;
+      }
+      if (quote.igst > 0) {
+        doc.text(`IGST (${quote.igst}%):`, summaryStartX, currentY);
+        doc.text(`Rs. ${((quote.subtotal * quote.igst) / 100).toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
+        currentY += 5;
+      }
+
+      // Loading / Transportation
+      if (quote.loadingCharges > 0) {
+        doc.text('Loading Charges:', summaryStartX, currentY);
+        doc.text(`Rs. ${quote.loadingCharges.toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
+        currentY += 5;
+      }
+      if (quote.transportCharges > 0) {
+        doc.text('Transportation:', summaryStartX, currentY);
+        doc.text(`Rs. ${quote.transportCharges.toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
+        currentY += 5;
+      }
+
+      doc.setDrawColor(203, 213, 225);
+      doc.line(summaryStartX, currentY, rightMargin - 1, currentY);
+      currentY += 4;
+
+      // Grand Total
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(15, 23, 42); // slate-900
+      doc.text('Grand Total:', summaryStartX, currentY);
+      doc.text(`Rs. ${quote.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, rightMargin - 1, currentY, { align: 'right' });
+
+      currentY += 15;
+
+      if (currentY > 240) {
+        doc.addPage();
+        currentY = 20;
+      }
+
+      // Terms
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.text('Terms & Conditions:', leftMargin, currentY);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139); // slate-500
+      
+      const termsLines = quote.terms ? quote.terms.split('\n') : [];
+      let termsY = currentY + 4;
+      termsLines.forEach((line) => {
+        doc.text(line, leftMargin, termsY);
+        termsY += 4;
+      });
+
+      // Signature box
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(15, 23, 42);
+      doc.text('For UJJWAL IRON', 150, currentY);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text('Authorized Signatory', 150, currentY + 18);
+
+      const filename = `${quote.quotationNo}_${quote.customerName.replace(/\s+/g, '_')}.pdf`;
+      doc.save(filename);
+    } catch (err) {
+      console.error('PDF Generation Error:', err);
+      alert('Failed to generate PDF. Check console logs.');
+    }
   };
 
   const handleTestSmtp = async () => {
@@ -542,9 +1072,24 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                 <span>Add New Product</span>
               </button>
             )}
+
+            {activeTab === 'quotations' && !isQuotationFormOpen && (
+              <button
+                onClick={openCreateQuotation}
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-amber-600/20 hover:bg-amber-500 transition-all duration-200"
+              >
+                <Plus size={16} />
+                <span>Create Quotation</span>
+              </button>
+            )}
             
             <button
-              onClick={() => activeTab === 'products' ? fetchProducts() : fetchInquiries()}
+              onClick={() => {
+                if (activeTab === 'products') fetchProducts();
+                else if (activeTab === 'inquiries') fetchInquiries();
+                else if (activeTab === 'gst') { fetchGstBills(); fetchNotifications(); }
+                else if (activeTab === 'quotations') fetchQuotations();
+              }}
               disabled={actionLoading}
               className="inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-3 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
               title="Refresh Current List"
@@ -615,6 +1160,17 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                 {notifications.filter(n => !n.read).length} NEW
               </span>
             )}
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('quotations'); setQuotationSearchQuery(''); fetchQuotations(); }}
+            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 flex items-center gap-2 ${
+              activeTab === 'quotations'
+                ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+            }`}
+          >
+            <span>Quotations ({quotations.length})</span>
           </button>
         </div>
 
@@ -1013,6 +1569,445 @@ We would like to share the latest wholesale rates and specifications. Let us kno
               </div>
             </div>
 
+          </div>
+        )}
+
+        {/* Tab 4: Quotations Panel */}
+        {activeTab === 'quotations' && (
+          <div>
+            {!isQuotationFormOpen ? (
+              /* --- LIST OF SAVED QUOTATIONS --- */
+              <div>
+                {/* Search / Filter */}
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-8">
+                  <div className="sm:col-span-12 relative">
+                    <Search className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search quotation number or customer name..."
+                      value={quotationSearchQuery}
+                      onChange={(e) => setQuotationSearchQuery(e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 pl-11 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Table of Quotations */}
+                <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/20 shadow-lg">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-left text-sm text-slate-500 dark:text-slate-400">
+                      <thead className="bg-slate-50 dark:bg-slate-900/60 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                          <th className="px-6 py-4">Quote No</th>
+                          <th className="px-6 py-4">Customer Details</th>
+                          <th className="px-6 py-4">Date</th>
+                          <th className="px-6 py-4">Validity</th>
+                          <th className="px-6 py-4">Total Amount</th>
+                          <th className="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800/80">
+                        {quotations.filter(q => 
+                          q.quotationNo.toLowerCase().includes(quotationSearchQuery.toLowerCase()) ||
+                          q.customerName.toLowerCase().includes(quotationSearchQuery.toLowerCase())
+                        ).length === 0 ? (
+                          <tr>
+                            <td colSpan="6" className="px-6 py-12 text-center text-slate-450 dark:text-slate-500">
+                              No quotations found. Click "+ Create Quotation" above to start.
+                            </td>
+                          </tr>
+                        ) : (
+                          quotations.filter(q => 
+                            q.quotationNo.toLowerCase().includes(quotationSearchQuery.toLowerCase()) ||
+                            q.customerName.toLowerCase().includes(quotationSearchQuery.toLowerCase())
+                          ).map((quote) => (
+                            <tr key={quote._id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+                              <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">
+                                {quote.quotationNo}
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-slate-850 dark:text-stone-300">{quote.customerName}</span>
+                                  <span className="text-xs text-slate-500 mt-0.5">Ph: {quote.phone}</span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-xs">
+                                {new Date(quote.date).toLocaleDateString('en-IN')}
+                              </td>
+                              <td className="px-6 py-4 text-xs font-semibold">
+                                {quote.validityDays} Days
+                              </td>
+                              <td className="px-6 py-4 font-mono font-black text-amber-600 dark:text-amber-400">
+                                ₹{quote.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <div className="inline-flex items-center gap-2">
+                                  <button
+                                    onClick={() => handleDownloadQuotationPdf(quote)}
+                                    className="p-2 text-slate-500 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400 rounded-lg hover:bg-slate-105 dark:hover:bg-slate-800 transition-colors"
+                                    title="Download PDF Quotation"
+                                  >
+                                    <Download size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => openEditQuotation(quote)}
+                                    className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-105 dark:hover:bg-slate-800 transition-colors"
+                                    title="Edit Quotation"
+                                  >
+                                    <Edit size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteQuotation(quote._id)}
+                                    className="p-2 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded-lg hover:bg-slate-105 dark:hover:bg-slate-800 transition-colors"
+                                    title="Delete Quotation"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* --- QUOTATION BUILDER FORM --- */
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-xl">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mb-6">
+                  {editingQuotationId ? `Edit Quotation Details (${quotationFormData.quotationNo})` : 'Build New Steel Quotation'}
+                </h3>
+
+                <form onSubmit={handleQuotationFormSubmit} className="space-y-6">
+                  {/* Part 1: Customer Details */}
+                  <div className="bg-slate-50/50 dark:bg-slate-950/20 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 space-y-4">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Customer & General Info</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Customer / Business Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={quotationFormData.customerName}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, customerName: e.target.value }))}
+                          placeholder="e.g. Ramesh Construction"
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Phone Number *</label>
+                        <input
+                          type="text"
+                          required
+                          value={quotationFormData.phone}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, phone: e.target.value }))}
+                          placeholder="10 digit number..."
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Email Address</label>
+                        <input
+                          type="email"
+                          value={quotationFormData.email}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, email: e.target.value }))}
+                          placeholder="e.g. sales@company.com"
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Delivery / Site Address</label>
+                        <input
+                          type="text"
+                          value={quotationFormData.address}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, address: e.target.value }))}
+                          placeholder="e.g. Saguna More Site, Danapur"
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Customer GSTIN</label>
+                        <input
+                          type="text"
+                          value={quotationFormData.gstNo}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, gstNo: e.target.value.toUpperCase() }))}
+                          placeholder="15 character code (optional)"
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Validity (Days)</label>
+                        <input
+                          type="number"
+                          required
+                          min="1"
+                          value={quotationFormData.validityDays}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, validityDays: Number(e.target.value) }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Part 2: Interactive Quotation Items Builder */}
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-550">Material / Steel Items List</h4>
+                      <button
+                        type="button"
+                        onClick={addQuotationItemRow}
+                        className="text-xs font-bold text-amber-600 hover:text-amber-500 flex items-center gap-1"
+                      >
+                        + Add Material Row
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {quotationFormData.items.map((item, index) => (
+                        <div 
+                          key={index} 
+                          className="flex flex-col md:flex-row items-stretch md:items-center gap-3 bg-slate-50/50 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
+                        >
+                          {/* Sync dropdown */}
+                          <div className="w-full md:w-44 shrink-0">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Select from Catalog</label>
+                            <select
+                              onChange={(e) => handleProductSelect(index, e.target.value)}
+                              defaultValue=""
+                              className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                            >
+                              <option value="">-- Custom (or pick product) --</option>
+                              {products.filter(p => p.isActive).map(p => (
+                                <option key={p._id} value={p._id}>{p.name} ({p.brand})</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Item Details */}
+                          <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <div>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Item Name *</label>
+                              <input
+                                type="text"
+                                required
+                                value={item.name}
+                                onChange={(e) => handleQuotationItemChange(index, 'name', e.target.value)}
+                                placeholder="Description (e.g. MS Angle)"
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Brand</label>
+                              <input
+                                type="text"
+                                value={item.brand}
+                                onChange={(e) => handleQuotationItemChange(index, 'brand', e.target.value)}
+                                placeholder="e.g. Tata/SAIL"
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Specs</label>
+                              <input
+                                type="text"
+                                value={item.specification}
+                                onChange={(e) => handleQuotationItemChange(index, 'specification', e.target.value)}
+                                placeholder="e.g. 6 Meters"
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Unit / Qty / Rate / Total */}
+                          <div className="grid grid-cols-4 gap-2 w-full md:w-96 shrink-0">
+                            <div>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Unit</label>
+                              <select
+                                value={item.unit}
+                                onChange={(e) => handleQuotationItemChange(index, 'unit', e.target.value)}
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                              >
+                                <option value="Pcs">Pcs</option>
+                                <option value="Tons">Tons</option>
+                                <option value="Kgs">Kgs</option>
+                                <option value="Meters">Mtr</option>
+                                <option value="Bundles">Bundle</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Qty *</label>
+                              <input
+                                type="number"
+                                required
+                                min="0.001"
+                                step="any"
+                                value={item.qty}
+                                onChange={(e) => handleQuotationItemChange(index, 'qty', e.target.value)}
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Rate *</label>
+                              <input
+                                type="number"
+                                required
+                                min="0"
+                                step="any"
+                                value={item.rate}
+                                onChange={(e) => handleQuotationItemChange(index, 'rate', e.target.value)}
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Total (₹)</label>
+                              <div className="w-full text-right font-mono text-xs px-2 py-2.5 font-bold text-slate-800 dark:text-slate-200 truncate">
+                                ₹{(item.qty * item.rate).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Delete row */}
+                          <div className="flex items-center justify-end md:pt-4">
+                            <button
+                              type="button"
+                              onClick={() => removeQuotationItemRow(index)}
+                              disabled={quotationFormData.items.length === 1}
+                              className="p-2 text-slate-400 hover:text-rose-500 disabled:opacity-30 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                              title="Delete Row"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Part 3: Financial Calculations & Taxes */}
+                  <div className="bg-slate-50/50 dark:bg-slate-955/20 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-550">Taxes & Logistics</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">CGST (%)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="any"
+                          value={quotationFormData.cgst}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, cgst: Number(e.target.value) }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">SGST (%)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="any"
+                          value={quotationFormData.sgst}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, sgst: Number(e.target.value) }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">IGST (%)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="any"
+                          value={quotationFormData.igst}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, igst: Number(e.target.value) }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Loading Charges (₹)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="any"
+                          value={quotationFormData.loadingCharges}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, loadingCharges: Number(e.target.value) }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Transport Charges (₹)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="any"
+                          value={quotationFormData.transportCharges}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, transportCharges: Number(e.target.value) }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Cost Summary Info */}
+                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-4 text-right">
+                      <div className="text-sm font-semibold text-slate-550 space-y-1">
+                        <div>Items Subtotal: ₹{quotationFormData.subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+                        <div>Taxes calculated: ₹{quotationFormData.totalTax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+                      </div>
+                      
+                      <div className="sm:col-span-2 text-xl sm:text-2xl font-black text-amber-605 dark:text-amber-400">
+                        <span className="text-sm text-slate-500 font-bold block sm:inline mr-2">Grand Total:</span>
+                        ₹{quotationFormData.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Part 4: Editable Terms & Conditions */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                      Terms and Conditions (नियम और शर्तें)
+                    </label>
+                    <textarea
+                      rows="4"
+                      value={quotationFormData.terms}
+                      onChange={(e) => setQuotationFormData(prev => ({ ...prev, terms: e.target.value }))}
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none resize-none font-sans"
+                    ></textarea>
+                  </div>
+
+                  {/* Part 5: Actions */}
+                  <div className="flex gap-3 justify-end pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setIsQuotationFormOpen(false)}
+                      className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 px-5 py-3 text-sm font-bold text-slate-500 hover:text-slate-850 hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-lg hover:bg-amber-500 disabled:opacity-50"
+                    >
+                      <Save size={16} />
+                      <span>{loading ? 'Saving...' : 'Save & Close'}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
           </div>
         )}
 
