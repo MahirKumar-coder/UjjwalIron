@@ -1909,8 +1909,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                               required
                               value={item.name}
                               onChange={(e) => handleQuotationItemChange(index, 'name', e.target.value)}
-                              placeholder="Description (e.g. MS Angle 50x50x5 Tata)"
-                              className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                                                 className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
                             />
                           </div>
 
@@ -1939,7 +1938,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 step="any"
                                 value={item.qty}
                                 onChange={(e) => handleQuotationItemChange(index, 'qty', e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono"
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono"
                               />
                             </div>
                             <div>
@@ -1951,7 +1950,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 step="any"
                                 value={item.rate}
                                 onChange={(e) => handleQuotationItemChange(index, 'rate', e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono"
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono"
                               />
                             </div>
                             <div>
@@ -1980,7 +1979,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   </div>
 
                                     {/* Part 3: Financial Calculations & Logistics */}
-                  <div className="bg-slate-50/50 dark:bg-slate-955/20 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+                  <div className="bg-slate-50/50 dark:bg-slate-950/20 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-wider text-slate-550">Logistics & Charges</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
@@ -2003,7 +2002,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           step="any"
                           value={quotationFormData.transportCharges}
                           onChange={(e) => setQuotationFormData(prev => ({ ...prev, transportCharges: Number(e.target.value) }))}
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
                         />
                       </div>
                     </div>
