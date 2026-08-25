@@ -37,6 +37,7 @@ export default function AdminPage() {
   const [isQuotationFormOpen, setIsQuotationFormOpen] = useState(false);
   const [editingQuotationId, setEditingQuotationId] = useState(null);
   const [quotationSearchQuery, setQuotationSearchQuery] = useState('');
+  const [isQuotationPreview, setIsQuotationPreview] = useState(false);
   const [quotationFormData, setQuotationFormData] = useState({
     quotationNo: '',
     customerName: '',
@@ -45,17 +46,17 @@ export default function AdminPage() {
     address: '',
     gstNo: '',
     date: '',
-    validityDays: 7,
-    items: [{ name: '', brand: '', specification: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
-    cgst: 9,
-    sgst: 9,
+    validityDays: 1,
+    items: [{ name: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+    cgst: 0,
+    sgst: 0,
     igst: 0,
     loadingCharges: 0,
     transportCharges: 0,
     subtotal: 0,
     totalTax: 0,
     totalAmount: 0,
-    terms: `1. Prices are valid for 7 days.\n2. 100% advance payment before delivery.\n3. Loading & transportation charges extra as applicable.\n4. Goods once sold will not be returned.\n5. All disputes subject to Patna jurisdiction.`
+    terms: `1. Prices are valid for 1 day.\n2. 30% advance payment, balance before delivery.\n3. Loading & transportation charges extra as applicable.\n4. Goods once sold will not be returned.\n5. All disputes subject to Patna jurisdiction.\n6. Rates are including GST.`
   });
   
   // Search and Filter states
@@ -205,6 +206,7 @@ export default function AdminPage() {
 
   const openCreateQuotation = () => {
     setEditingQuotationId(null);
+    setIsQuotationPreview(false);
     setQuotationFormData({
       quotationNo: generateQuotationNo(),
       customerName: '',
@@ -213,23 +215,24 @@ export default function AdminPage() {
       address: '',
       gstNo: '',
       date: new Date().toISOString().slice(0, 10),
-      validityDays: 7,
-      items: [{ name: '', brand: '', specification: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
-      cgst: 9,
-      sgst: 9,
+      validityDays: 1,
+      items: [{ name: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+      cgst: 0,
+      sgst: 0,
       igst: 0,
       loadingCharges: 0,
       transportCharges: 0,
       subtotal: 0,
       totalTax: 0,
       totalAmount: 0,
-      terms: `1. Prices are valid for 7 days.\n2. 100% advance payment before delivery.\n3. Loading & transportation charges extra as applicable.\n4. Goods once sold will not be returned.\n5. All disputes subject to Patna jurisdiction.`
+      terms: `1. Prices are valid for 1 day.\n2. 30% advance payment, balance before delivery.\n3. Loading & transportation charges extra as applicable.\n4. Goods once sold will not be returned.\n5. All disputes subject to Patna jurisdiction.\n6. Rates are including GST.`
     });
     setIsQuotationFormOpen(true);
   };
 
   const openEditQuotation = (quote) => {
     setEditingQuotationId(quote._id);
+    setIsQuotationPreview(false);
     setQuotationFormData({
       quotationNo: quote.quotationNo,
       customerName: quote.customerName,
@@ -238,11 +241,9 @@ export default function AdminPage() {
       address: quote.address || '',
       gstNo: quote.gstNo || '',
       date: new Date(quote.date).toISOString().slice(0, 10),
-      validityDays: quote.validityDays || 7,
+      validityDays: quote.validityDays || 1,
       items: quote.items.map(item => ({
         name: item.name,
-        brand: item.brand || '',
-        specification: item.specification || '',
         qty: item.qty,
         unit: item.unit || 'Pcs',
         rate: item.rate,
@@ -323,7 +324,7 @@ export default function AdminPage() {
   const addQuotationItemRow = () => {
     setQuotationFormData(prev => ({
       ...prev,
-      items: [...prev.items, { name: '', brand: '', specification: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }]
+      items: [...prev.items, { name: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }]
     }));
   };
 
@@ -350,12 +351,11 @@ export default function AdminPage() {
     if (!prod) return;
 
     const updatedItems = [...quotationFormData.items];
-    updatedItems[index].name = prod.name;
-    updatedItems[index].brand = prod.brand;
     const specText = prod.specifications && prod.specifications.length > 0
       ? prod.specifications.map(s => `${s.key}: ${s.value}`).join(', ')
       : '';
-    updatedItems[index].specification = specText;
+    const brandText = prod.brand ? ` (${prod.brand}${specText ? `, ${specText}` : ''})` : (specText ? ` (${specText})` : '');
+    updatedItems[index].name = `${prod.name}${brandText}`;
     
     let estRate = 0;
     if (prod.price && prod.price !== 'On Request') {
@@ -384,19 +384,16 @@ export default function AdminPage() {
 
     const subtotal = updatedItems.reduce((acc, item) => acc + item.total, 0);
 
-    const cgstPct = Number(quotationFormData.cgst || 0);
-    const sgstPct = Number(quotationFormData.sgst || 0);
-    const igstPct = Number(quotationFormData.igst || 0);
+    const cgstPct = 0;
+    const sgstPct = 0;
+    const igstPct = 0;
 
-    const cgstAmt = (subtotal * cgstPct) / 100;
-    const sgstAmt = (subtotal * sgstPct) / 100;
-    const igstAmt = (subtotal * igstPct) / 100;
-    const totalTax = cgstAmt + sgstAmt + igstAmt;
+    const totalTax = 0;
 
     const loading = Number(quotationFormData.loadingCharges || 0);
     const transport = Number(quotationFormData.transportCharges || 0);
 
-    const totalAmount = subtotal + totalTax + loading + transport;
+    const totalAmount = Math.round(subtotal + loading + transport);
 
     if (
       JSON.stringify(updatedItems) !== JSON.stringify(quotationFormData.items) ||
@@ -416,9 +413,6 @@ export default function AdminPage() {
   }, [
     isQuotationFormOpen,
     quotationFormData.items,
-    quotationFormData.cgst,
-    quotationFormData.sgst,
-    quotationFormData.igst,
     quotationFormData.loadingCharges,
     quotationFormData.transportCharges
   ]);
@@ -498,22 +492,17 @@ export default function AdminPage() {
       doc.text(`Date: ${new Date(quote.date).toLocaleDateString('en-IN')}`, 125, currentY);
 
       currentY += 5;
-      if (quote.email) {
-        doc.text(`Email: ${quote.email}`, leftMargin, currentY);
-      } else {
-        doc.text('Email: N/A', leftMargin, currentY);
-      }
-      doc.text(`Validity: ${quote.validityDays} Days`, 125, currentY);
-
-      currentY += 5;
+      doc.text(`Validity: ${quote.validityDays} Day(s)`, 125, currentY);
       if (quote.gstNo) {
         doc.text(`GSTIN: ${quote.gstNo.toUpperCase()}`, leftMargin, currentY);
+        currentY += 5;
       }
       if (quote.address) {
-        doc.text(`Delivery: ${quote.address}`, leftMargin, currentY + (quote.gstNo ? 5 : 0));
+        doc.text(`Delivery: ${quote.address}`, leftMargin, currentY);
+        currentY += 5;
       }
 
-      currentY += (quote.gstNo || quote.address) ? 15 : 8;
+      currentY += 5;
 
       // Draw Items Table Headers
       doc.setFillColor(241, 245, 249); // slate-100 background
@@ -523,14 +512,12 @@ export default function AdminPage() {
       doc.setFontSize(8.5);
       doc.setTextColor(15, 23, 42); // slate-900
 
-      // columns: S.No, Description, Brand, Specification, Qty, Unit, Rate, Total
+      // columns: S.No, Description, Qty, Unit, Rate, Total
       doc.text('S.No', leftMargin + 2, currentY + 5.5);
       doc.text('Material Description', leftMargin + 12, currentY + 5.5);
-      doc.text('Brand', leftMargin + 77, currentY + 5.5);
-      doc.text('Specification', leftMargin + 102, currentY + 5.5);
-      doc.text('Qty', leftMargin + 136, currentY + 5.5, { align: 'right' });
-      doc.text('Unit', leftMargin + 138, currentY + 5.5);
-      doc.text('Rate', leftMargin + 164, currentY + 5.5, { align: 'right' });
+      doc.text('Qty', leftMargin + 131, currentY + 5.5, { align: 'right' });
+      doc.text('Unit', leftMargin + 133, currentY + 5.5);
+      doc.text('Rate', leftMargin + 163, currentY + 5.5, { align: 'right' });
       doc.text('Total (Rs)', rightMargin - 1, currentY + 5.5, { align: 'right' });
 
       currentY += 8;
@@ -550,11 +537,9 @@ export default function AdminPage() {
           doc.setFont('helvetica', 'bold');
           doc.text('S.No', leftMargin + 2, currentY + 5.5);
           doc.text('Material Description', leftMargin + 12, currentY + 5.5);
-          doc.text('Brand', leftMargin + 77, currentY + 5.5);
-          doc.text('Specification', leftMargin + 102, currentY + 5.5);
-          doc.text('Qty', leftMargin + 136, currentY + 5.5, { align: 'right' });
-          doc.text('Unit', leftMargin + 138, currentY + 5.5);
-          doc.text('Rate', leftMargin + 164, currentY + 5.5, { align: 'right' });
+          doc.text('Qty', leftMargin + 131, currentY + 5.5, { align: 'right' });
+          doc.text('Unit', leftMargin + 133, currentY + 5.5);
+          doc.text('Rate', leftMargin + 163, currentY + 5.5, { align: 'right' });
           doc.text('Total (Rs)', rightMargin - 1, currentY + 5.5, { align: 'right' });
           currentY += 8;
           doc.setFont('helvetica', 'normal');
@@ -562,14 +547,12 @@ export default function AdminPage() {
 
         doc.text(String(index + 1), leftMargin + 2, currentY + 5.5);
         
-        const itemName = item.name.length > 32 ? item.name.substring(0, 30) + '...' : item.name;
+        const itemName = item.name.length > 60 ? item.name.substring(0, 58) + '...' : item.name;
         doc.text(itemName, leftMargin + 12, currentY + 5.5);
         
-        doc.text(item.brand || '-', leftMargin + 77, currentY + 5.5);
-        doc.text(item.specification || '-', leftMargin + 102, currentY + 5.5);
-        doc.text(String(item.qty), leftMargin + 136, currentY + 5.5, { align: 'right' });
-        doc.text(item.unit || 'Pcs', leftMargin + 138, currentY + 5.5);
-        doc.text(item.rate.toFixed(2), leftMargin + 164, currentY + 5.5, { align: 'right' });
+        doc.text(String(item.qty), leftMargin + 131, currentY + 5.5, { align: 'right' });
+        doc.text(item.unit || 'Pcs', leftMargin + 133, currentY + 5.5);
+        doc.text(item.rate.toFixed(2), leftMargin + 163, currentY + 5.5, { align: 'right' });
         doc.text((item.qty * item.rate).toFixed(2), rightMargin - 1, currentY + 5.5, { align: 'right' });
 
         doc.setDrawColor(241, 245, 249);
@@ -595,23 +578,6 @@ export default function AdminPage() {
       doc.text(`Rs. ${quote.subtotal.toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
       currentY += 5;
 
-      // Taxes (CGST / SGST / IGST)
-      if (quote.cgst > 0) {
-        doc.text(`CGST (${quote.cgst}%):`, summaryStartX, currentY);
-        doc.text(`Rs. ${((quote.subtotal * quote.cgst) / 100).toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
-        currentY += 5;
-      }
-      if (quote.sgst > 0) {
-        doc.text(`SGST (${quote.sgst}%):`, summaryStartX, currentY);
-        doc.text(`Rs. ${((quote.subtotal * quote.sgst) / 100).toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
-        currentY += 5;
-      }
-      if (quote.igst > 0) {
-        doc.text(`IGST (${quote.igst}%):`, summaryStartX, currentY);
-        doc.text(`Rs. ${((quote.subtotal * quote.igst) / 100).toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
-        currentY += 5;
-      }
-
       // Loading / Transportation
       if (quote.loadingCharges > 0) {
         doc.text('Loading Charges:', summaryStartX, currentY);
@@ -633,7 +599,7 @@ export default function AdminPage() {
       doc.setFontSize(11);
       doc.setTextColor(15, 23, 42); // slate-900
       doc.text('Grand Total:', summaryStartX, currentY);
-      doc.text(`Rs. ${quote.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, rightMargin - 1, currentY, { align: 'right' });
+      doc.text(`Rs. ${Math.round(quote.totalAmount).toLocaleString('en-IN')}`, rightMargin - 1, currentY, { align: 'right' });
 
       currentY += 15;
 
@@ -1115,10 +1081,10 @@ We would like to share the latest wholesale rates and specifications. Let us kno
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex gap-4 border-b border-slate-200 dark:border-slate-900 pb-5 mb-8">
+        <div className="flex gap-4 border-b border-slate-200 dark:border-slate-900 pb-2 mb-8 overflow-x-auto whitespace-nowrap scrollbar-none">
           <button
             onClick={() => { setActiveTab('products'); setSearchQuery(''); }}
-            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 ${
+            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-205 shrink-0 ${
               activeTab === 'products'
                 ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
@@ -1129,7 +1095,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
           
           <button
             onClick={() => { setActiveTab('inquiries'); setSearchQuery(''); }}
-            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 flex items-center gap-2 ${
+            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-205 shrink-0 flex items-center gap-2 ${
               activeTab === 'inquiries'
                 ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
@@ -1149,7 +1115,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
 
           <button
             onClick={() => { setActiveTab('gst'); setSearchQuery(''); fetchGstBills(); fetchNotifications(); }}
-            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 flex items-center gap-2 ${
+            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-205 shrink-0 flex items-center gap-2 ${
               activeTab === 'gst'
                 ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
@@ -1165,7 +1131,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
 
           <button
             onClick={() => { setActiveTab('quotations'); setQuotationSearchQuery(''); fetchQuotations(); }}
-            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-200 flex items-center gap-2 ${
+            className={`pb-2.5 text-sm font-bold tracking-wide border-b-2 transition-all duration-205 shrink-0 flex items-center gap-2 ${
               activeTab === 'quotations'
                 ? 'border-amber-600 text-amber-600 dark:border-amber-500 dark:text-amber-500'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
@@ -1674,6 +1640,159 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   </div>
                 </div>
               </div>
+            ) : isQuotationPreview ? (
+              /* --- QUOTATION PREVIEW MODE --- */
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-xl text-slate-900 dark:text-white">
+                <div className="flex flex-wrap gap-3 justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsQuotationPreview(false)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      <Edit size={14} />
+                      <span>Edit (वापस एडिट करें)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadQuotationPdf(quotationFormData)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      <Download size={14} />
+                      <span>Download PDF (डाउनलोड करें)</span>
+                    </button>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsQuotationFormOpen(false)}
+                      className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-850 hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuotationFormSubmit({ preventDefault: () => {} })}
+                      disabled={loading}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-amber-500 disabled:opacity-50"
+                    >
+                      <Save size={14} />
+                      <span>{loading ? 'Saving...' : 'Save & Close'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Printable Document A4 Canvas Preview */}
+                <div className="mx-auto max-w-3xl bg-white text-slate-900 p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-inner font-sans">
+                  
+                  {/* Letterhead Header */}
+                  <div className="flex justify-between items-start pb-6 border-b border-slate-200">
+                    <div>
+                      <h2 className="text-2xl font-black tracking-tight text-slate-900">UJJWAL IRON</h2>
+                      <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Dealers in MS Pipes, MS Angles, MS Flats, GP Pipes & Roofing Sheets</p>
+                      <p className="text-[10px] text-slate-600 mt-2">Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011</p>
+                      <p className="text-[10px] text-slate-600 mt-0.5">Mobile: +91 8986043632 | Email: sales@ujjwaliron.com</p>
+                    </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/logo.jpg" alt="Logo" className="h-14 w-14 rounded-full border border-slate-200 object-cover" />
+                  </div>
+
+                  {/* Document Title */}
+                  <div className="text-center my-6">
+                    <h3 className="text-lg font-black text-amber-600 tracking-widest uppercase">QUOTATION</h3>
+                  </div>
+
+                  {/* Customer and Quote Details Metadata */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-b border-slate-100 py-4 my-4 text-[10px] text-slate-600 leading-relaxed">
+                    <div>
+                      <span className="font-extrabold text-slate-900 block uppercase mb-1">Quotation To:</span>
+                      <p className="text-xs font-black text-slate-900">{quotationFormData.customerName}</p>
+                      <p>Phone: +91 {quotationFormData.phone}</p>
+                      {quotationFormData.address && <p>Delivery: {quotationFormData.address}</p>}
+                      {quotationFormData.gstNo && <p>GSTIN: {quotationFormData.gstNo.toUpperCase()}</p>}
+                    </div>
+                    <div className="md:text-right">
+                      <span className="font-extrabold text-slate-900 block uppercase mb-1">Quotation Details:</span>
+                      <p>Quotation No: <span className="font-mono font-bold text-slate-900">{quotationFormData.quotationNo}</span></p>
+                      <p>Date: {new Date(quotationFormData.date || new Date()).toLocaleDateString('en-IN')}</p>
+                      <p>Validity: {quotationFormData.validityDays} Day(s)</p>
+                    </div>
+                  </div>
+
+                  {/* Items Table */}
+                  <div className="my-6 overflow-hidden border border-slate-200 rounded-lg">
+                    <table className="w-full text-left text-[10px] border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-slate-800 font-bold">
+                          <th className="px-4 py-2 w-12 text-center">S.No</th>
+                          <th className="px-4 py-2">Material Description</th>
+                          <th className="px-4 py-2 text-right w-16">Qty</th>
+                          <th className="px-4 py-2 w-16">Unit</th>
+                          <th className="px-4 py-2 text-right w-24">Rate (₹)</th>
+                          <th className="px-4 py-2 text-right w-24">Total (₹)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-slate-700">
+                        {quotationFormData.items.map((item, idx) => (
+                          <tr key={idx}>
+                            <td className="px-4 py-2 text-center">{idx + 1}</td>
+                            <td className="px-4 py-2 font-medium">{item.name || 'Custom Item'}</td>
+                            <td className="px-4 py-2 text-right font-mono">{item.qty}</td>
+                            <td className="px-4 py-2">{item.unit}</td>
+                            <td className="px-4 py-2 text-right font-mono">₹{Number(item.rate).toFixed(2)}</td>
+                            <td className="px-4 py-2 text-right font-mono font-bold">₹{Number(item.qty * item.rate).toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Calculations summary and Signatory section */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mt-6 pt-4 border-t border-slate-200 text-[10px] text-slate-600">
+                    {/* Terms */}
+                    <div>
+                      <span className="font-extrabold text-slate-900 block uppercase mb-1">Terms & Conditions:</span>
+                      <ul className="list-none space-y-1 pl-0">
+                        {quotationFormData.terms.split('\n').map((term, tIdx) => (
+                          <li key={tIdx} className="leading-snug">{term}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Cost Calculations Summary */}
+                    <div className="flex flex-col items-end gap-2 text-right">
+                      <div className="w-full max-w-xs space-y-1">
+                        <div className="flex justify-between">
+                          <span>Subtotal:</span>
+                          <span className="font-mono">₹{quotationFormData.subtotal.toFixed(2)}</span>
+                        </div>
+                        {quotationFormData.loadingCharges > 0 && (
+                          <div className="flex justify-between">
+                            <span>Loading Charges:</span>
+                            <span className="font-mono">₹{quotationFormData.loadingCharges.toFixed(2)}</span>
+                          </div>
+                        )}
+                        {quotationFormData.transportCharges > 0 && (
+                          <div className="flex justify-between">
+                            <span>Transportation:</span>
+                            <span className="font-mono">₹{quotationFormData.transportCharges.toFixed(2)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between border-t border-slate-200 pt-2 text-sm font-black text-amber-600">
+                          <span>Grand Total:</span>
+                          <span className="font-mono">₹{quotationFormData.totalAmount.toLocaleString('en-IN')}</span>
+                        </div>
+                      </div>
+
+                      {/* Signatory */}
+                      <div className="mt-8 pt-8 text-right w-full">
+                        <p className="font-extrabold text-slate-900">For UJJWAL IRON</p>
+                        <p className="text-[8px] text-slate-400 mt-8">Authorized Signatory</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : (
               /* --- QUOTATION BUILDER FORM --- */
               <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-xl">
@@ -1685,7 +1804,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   {/* Part 1: Customer Details */}
                   <div className="bg-slate-50/50 dark:bg-slate-950/20 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 mb-2">Customer & General Info</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Customer / Business Name *</label>
                         <input
@@ -1706,17 +1825,6 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           value={quotationFormData.phone}
                           onChange={(e) => setQuotationFormData(prev => ({ ...prev, phone: e.target.value }))}
                           placeholder="10 digit number..."
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Email Address</label>
-                        <input
-                          type="email"
-                          value={quotationFormData.email}
-                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, email: e.target.value }))}
-                          placeholder="e.g. sales@company.com"
                           className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                         />
                       </div>
@@ -1794,38 +1902,16 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           </div>
 
                           {/* Item Details */}
-                          <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <div>
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Item Name *</label>
-                              <input
-                                type="text"
-                                required
-                                value={item.name}
-                                onChange={(e) => handleQuotationItemChange(index, 'name', e.target.value)}
-                                placeholder="Description (e.g. MS Angle)"
-                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Brand</label>
-                              <input
-                                type="text"
-                                value={item.brand}
-                                onChange={(e) => handleQuotationItemChange(index, 'brand', e.target.value)}
-                                placeholder="e.g. Tata/SAIL"
-                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Specs</label>
-                              <input
-                                type="text"
-                                value={item.specification}
-                                onChange={(e) => handleQuotationItemChange(index, 'specification', e.target.value)}
-                                placeholder="e.g. 6 Meters"
-                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
-                              />
-                            </div>
+                          <div className="flex-grow">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Item Name *</label>
+                            <input
+                              type="text"
+                              required
+                              value={item.name}
+                              onChange={(e) => handleQuotationItemChange(index, 'name', e.target.value)}
+                              placeholder="Description (e.g. MS Angle 50x50x5 Tata)"
+                              className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                            />
                           </div>
 
                           {/* Unit / Qty / Rate / Total */}
@@ -1893,49 +1979,10 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     </div>
                   </div>
 
-                  {/* Part 3: Financial Calculations & Taxes */}
+                                    {/* Part 3: Financial Calculations & Logistics */}
                   <div className="bg-slate-50/50 dark:bg-slate-955/20 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-550">Taxes & Logistics</h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">CGST (%)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="any"
-                          value={quotationFormData.cgst}
-                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, cgst: Number(e.target.value) }))}
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">SGST (%)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="any"
-                          value={quotationFormData.sgst}
-                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, sgst: Number(e.target.value) }))}
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">IGST (%)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="any"
-                          value={quotationFormData.igst}
-                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, igst: Number(e.target.value) }))}
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
-                        />
-                      </div>
-
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-550">Logistics & Charges</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Loading Charges (₹)</label>
                         <input
@@ -1944,7 +1991,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           step="any"
                           value={quotationFormData.loadingCharges}
                           onChange={(e) => setQuotationFormData(prev => ({ ...prev, loadingCharges: Number(e.target.value) }))}
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
                         />
                       </div>
 
@@ -1962,15 +2009,14 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     </div>
 
                     {/* Cost Summary Info */}
-                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-4 text-right">
+                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4 text-right">
                       <div className="text-sm font-semibold text-slate-550 space-y-1">
                         <div>Items Subtotal: ₹{quotationFormData.subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
-                        <div>Taxes calculated: ₹{quotationFormData.totalTax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
                       </div>
                       
-                      <div className="sm:col-span-2 text-xl sm:text-2xl font-black text-amber-605 dark:text-amber-400">
-                        <span className="text-sm text-slate-500 font-bold block sm:inline mr-2">Grand Total:</span>
-                        ₹{quotationFormData.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      <div className="text-xl sm:text-2xl font-black text-amber-605 dark:text-amber-400">
+                        <span className="text-sm text-slate-555 font-bold block sm:inline mr-2">Grand Total:</span>
+                        ₹{quotationFormData.totalAmount.toLocaleString('en-IN')}
                       </div>
                     </div>
                   </div>
@@ -1996,6 +2042,14 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 px-5 py-3 text-sm font-bold text-slate-500 hover:text-slate-850 hover:bg-slate-50"
                     >
                       Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsQuotationPreview(true)}
+                      className="inline-flex items-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 px-5 py-3 text-sm font-bold shadow-sm transition-colors"
+                    >
+                      <Eye size={16} />
+                      <span>Preview Quotation</span>
                     </button>
                     <button
                       type="submit"
