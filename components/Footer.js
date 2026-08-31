@@ -49,6 +49,9 @@ export default function Footer() {
                 <Link href="/products" className="text-sm hover:text-amber-500 dark:hover:text-amber-400 transition-colors">Product Catalog</Link>
               </li>
               <li>
+                <Link href="/stainless-steel" className="text-sm hover:text-amber-500 dark:hover:text-amber-400 transition-colors">Stainless Steel</Link>
+              </li>
+              <li>
                 <Link href="/contact" className="text-sm hover:text-amber-500 dark:hover:text-amber-400 transition-colors">Contact & GST Info</Link>
               </li>
             </ul>

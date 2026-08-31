@@ -50,7 +50,7 @@ const GstBillSchema = new mongoose.Schema(
     },
     totalAmount: {
       type: Number,
-      required: true,
+      default: 0,
     },
   },
   {

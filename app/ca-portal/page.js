@@ -25,7 +25,6 @@ export default function CaPortal() {
     gstNo: '',
     billDate: new Date().toISOString().split('T')[0],
     pdfUrl: '',
-    totalAmount: '',
   });
   const [pdfUploading, setPdfUploading] = useState(false);
   const [pdfUploadSuccess, setPdfUploadSuccess] = useState(false);
@@ -227,7 +226,6 @@ export default function CaPortal() {
           gstNo: '',
           billDate: new Date().toISOString().split('T')[0],
           pdfUrl: '',
-          totalAmount: '',
         });
         setPdfUploadSuccess(false);
 
@@ -514,19 +512,6 @@ export default function CaPortal() {
                       className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Total Bill Amount (Gross INR)</label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    value={billForm.totalAmount}
-                    onChange={(e) => setBillForm({ ...billForm, totalAmount: e.target.value })}
-                    placeholder="e.g. 150000"
-                    className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-stone-400 focus:border-amber-500 focus:outline-none"
-                  />
                 </div>
 
                 {/* PDF File Uploader Input */}

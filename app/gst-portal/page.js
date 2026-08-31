@@ -481,15 +481,17 @@ export default function GstPortal() {
                     </div>
 
                     {/* Amount & CTA Row */}
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-stone-200 dark:border-stone-850">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-stone-200 dark:border-stone-800">
                       
                       {/* Price display */}
-                      <div className="flex flex-col sm:text-right pr-4">
-                        <span className="text-xs text-stone-450 dark:text-stone-500 uppercase font-bold tracking-wide">Total Amount</span>
-                        <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono">
-                          ₹{bill.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                      </div>
+                      {bill.totalAmount && bill.totalAmount > 0 ? (
+                        <div className="flex flex-col sm:text-right pr-4">
+                          <span className="text-xs text-stone-500 uppercase font-bold tracking-wide">Total Amount</span>
+                          <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono">
+                            ₹{bill.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      ) : null}
 
                       {/* Download Button */}
                       <button
@@ -503,7 +505,7 @@ export default function GstPortal() {
                       {/* View details */}
                       <button
                         onClick={() => setSelectedBill(bill)}
-                        className="flex items-center justify-center gap-1.5 text-stone-600 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white px-4 py-3 rounded-xl border-2 border-stone-200 dark:border-stone-850 hover:bg-stone-50 dark:hover:bg-stone-900/60 transition-colors text-sm font-bold cursor-pointer"
+                        className="flex items-center justify-center gap-1.5 text-stone-600 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white px-4 py-3 rounded-xl border-2 border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-900/60 transition-colors text-sm font-bold cursor-pointer"
                       >
                         <Eye size={16} />
                         <span>View items</span>
@@ -525,11 +527,11 @@ export default function GstPortal() {
               <div className="flex justify-between items-start border-b-2 border-stone-100 dark:border-stone-800 pb-4 mb-6">
                 <div>
                   <h3 className="text-xl font-black text-slate-900 dark:text-white">Tax Invoice Details</h3>
-                  <p className="text-sm font-bold text-amber-600 dark:text-amber-550 mt-1">Invoice Number: {selectedBill.billNo}</p>
+                  <p className="text-sm font-bold text-amber-600 dark:text-amber-500 mt-1">Invoice Number: {selectedBill.billNo}</p>
                 </div>
                 <button
                   onClick={() => setSelectedBill(null)}
-                  className="rounded-xl border border-stone-300 dark:border-stone-750 px-3 py-1 text-base font-bold text-stone-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                  className="rounded-xl border border-stone-300 dark:border-stone-700 px-3 py-1 text-base font-bold text-stone-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                 >
                   Close &times;
                 </button>
@@ -537,38 +539,42 @@ export default function GstPortal() {
 
               {/* Customer info & bill items details */}
               <div className="space-y-4 text-base text-stone-700 dark:text-stone-300">
-                <div className="flex justify-between border-b border-stone-100 dark:border-stone-850 pb-2">
-                  <span className="text-stone-450">Billed To:</span>
+                <div className="flex justify-between border-b border-stone-100 dark:border-stone-800 pb-2">
+                  <span className="text-stone-500">Billed To:</span>
                   <span className="font-extrabold text-slate-900 dark:text-white">{selectedBill.customerName}</span>
                 </div>
-                <div className="flex justify-between border-b border-stone-100 dark:border-stone-850 pb-2">
-                  <span className="text-stone-450">GSTIN:</span>
+                <div className="flex justify-between border-b border-stone-100 dark:border-stone-800 pb-2">
+                  <span className="text-stone-500">GSTIN:</span>
                   <span className="font-mono font-bold text-slate-900 dark:text-white">{selectedBill.gstNo}</span>
                 </div>
-                <div className="flex justify-between border-b border-stone-100 dark:border-stone-850 pb-2">
-                  <span className="text-stone-450">Invoice Date:</span>
+                <div className="flex justify-between border-b border-stone-100 dark:border-stone-800 pb-2">
+                  <span className="text-stone-500">Invoice Date:</span>
                   <span className="font-bold">{new Date(selectedBill.billDate).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</span>
                 </div>
 
                 {/* Items Summary list */}
-                <div className="pt-2">
-                  <span className="text-stone-450 text-sm font-bold block mb-2">Purchased Items:</span>
-                  <div className="bg-stone-50 dark:bg-stone-950 p-3 rounded-xl border border-stone-200 dark:border-stone-850 space-y-2 text-sm font-semibold max-h-[140px] overflow-y-auto">
-                    {selectedBill.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-stone-605 dark:text-stone-350">
-                        <span>• {item.name} <span className="text-stone-400 font-normal">({item.qty} pcs)</span></span>
-                        <span className="font-mono">₹{(item.total || (item.qty * item.rate)).toLocaleString('en-IN')}</span>
-                      </div>
-                    ))}
+                {selectedBill.items && selectedBill.items.length > 0 && (
+                  <div className="pt-2">
+                    <span className="text-stone-500 text-sm font-bold block mb-2">Purchased Items:</span>
+                    <div className="bg-stone-50 dark:bg-stone-950 p-3 rounded-xl border border-stone-200 dark:border-stone-800 space-y-2 text-sm font-semibold max-h-[140px] overflow-y-auto">
+                      {selectedBill.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between items-center text-stone-600 dark:text-stone-300">
+                          <span>• {item.name} <span className="text-stone-400 font-normal">({item.qty} pcs)</span></span>
+                          <span className="font-mono">₹{(item.total || (item.qty * item.rate)).toLocaleString('en-IN')}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="flex justify-between border-t-2 border-stone-100 dark:border-stone-850 pt-4 text-lg font-black">
-                  <span className="text-slate-900 dark:text-white">Total Bill Amount:</span>
-                  <span className="font-mono text-amber-600 dark:text-amber-400">
-                    ₹{selectedBill.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
+                {selectedBill.totalAmount && selectedBill.totalAmount > 0 ? (
+                  <div className="flex justify-between border-t-2 border-stone-100 dark:border-stone-800 pt-4 text-lg font-black">
+                    <span className="text-slate-900 dark:text-white">Total Bill Amount:</span>
+                    <span className="font-mono text-amber-600 dark:text-amber-400">
+                      ₹{selectedBill.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                ) : null}
 
                 {/* Actions */}
                 <div className="pt-6 border-t-2 border-stone-100 dark:border-stone-800 flex justify-end gap-3">

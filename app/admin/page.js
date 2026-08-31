@@ -74,6 +74,7 @@ export default function AdminPage() {
     name: '',
     brand: '',
     category: 'MS Pipes',
+    subCategory: '',
     description: '',
     price: 'On Request',
     imageUrl: '',
@@ -453,7 +454,7 @@ export default function AdminPage() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(71, 85, 105); // slate-600
-      doc.text('Dealers in MS Pipes, MS Angles, MS Flats, GP Pipes & Roofing Sheets', 42, currentY + 11);
+      doc.text('Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Pipes, Angles, Flats & Channels', 42, currentY + 11);
       doc.text('Address: Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011', 42, currentY + 16);
       doc.text('Mobile: +91 8986043632 | Email: sales@ujjwaliron.com', 42, currentY + 21);
 
@@ -792,6 +793,7 @@ export default function AdminPage() {
       name: '',
       brand: '',
       category: 'MS Pipes',
+      subCategory: '',
       description: '',
       price: 'On Request',
       imageUrl: '',
@@ -810,6 +812,7 @@ export default function AdminPage() {
       name: prod.name,
       brand: prod.brand,
       category: prod.category,
+      subCategory: prod.subCategory || '',
       description: prod.description || '',
       price: prod.price || 'On Request',
       imageUrl: prod.imageUrl || '',
@@ -961,7 +964,21 @@ We would like to share the latest wholesale rates and specifications. Let us kno
     return matchesSearch && matchesStatus;
   });
 
-  const categories = ['MS Pipes', 'Roofing Sheets', 'MS Angle & MS Flat', 'GP Pipes', 'Angles & Channels', 'Other'];
+  const categories = [
+    'MS Pipes',
+    'Tata Pipe',
+    'HR Pipe',
+    'CR Pipe',
+    'Tata Sheet',
+    'Jindal Sheet',
+    'MS Angle',
+    'MS Flat',
+    'MS Channel',
+    'MS Bar',
+    'MS Plate',
+    'Chaukhat',
+    'Other'
+  ];
   const newLeadsCount = inquiries.filter(i => i.status === 'New').length;
 
   // 1. Password Gated Interface
@@ -1202,9 +1219,16 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-900 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
-                              <Tag size={10} /> {prod.category}
-                            </span>
+                            <div className="flex flex-col gap-1 items-start">
+                              <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-900 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
+                                <Tag size={10} /> {prod.category}
+                              </span>
+                              {prod.subCategory && (
+                                <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 dark:bg-amber-500/20 px-2 py-0.5 text-2xs font-bold text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                                  {prod.subCategory}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-4 text-amber-600 dark:text-amber-400 font-bold">
                             {prod.price}
@@ -1689,7 +1713,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   <div className="flex justify-between items-start pb-6 border-b border-slate-200">
                     <div>
                       <h2 className="text-2xl font-black tracking-tight text-slate-900">UJJWAL IRON</h2>
-                      <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Dealers in MS Pipes, MS Angles, MS Flats, GP Pipes & Roofing Sheets</p>
+                      <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Pipes, Angles, Flats & Channels</p>
                       <p className="text-[10px] text-slate-600 mt-2">Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011</p>
                       <p className="text-[10px] text-slate-600 mt-0.5">Mobile: +91 8986043632 | Email: sales@ujjwaliron.com</p>
                     </div>
@@ -2126,7 +2150,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       name="category"
                       value={formData.category}
                       onChange={handleFormChange}
-                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-700 dark:text-slate-350 focus:border-amber-500 focus:outline-none"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:border-amber-500 focus:outline-none"
                     >
                       {categories.map((c) => (
                         <option key={c} value={c}>{c}</option>
@@ -2134,8 +2158,28 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     </select>
                   </div>
 
+                  {/* Sub-Category (Section Shape for MS Pipes) */}
+                  {formData.category === 'MS Pipes' ? (
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                        MS Pipe Section Shape (Sub-Category)
+                      </label>
+                      <select
+                        name="subCategory"
+                        value={formData.subCategory || ''}
+                        onChange={handleFormChange}
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:border-amber-500 focus:outline-none"
+                      >
+                        <option value="">-- General / Unspecified --</option>
+                        <option value="Round">Round (गोल पाइप)</option>
+                        <option value="Rectangle">Rectangle (आयत पाइप)</option>
+                        <option value="Square">Square (चौकोर पाइप)</option>
+                      </select>
+                    </div>
+                  ) : null}
+
                   {/* Price */}
-                  <div>
+                  <div className={formData.category !== 'MS Pipes' ? '' : 'sm:col-span-2'}>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
                       Estimated Price (or On Request)
                     </label>

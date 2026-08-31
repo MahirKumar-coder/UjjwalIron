@@ -4,14 +4,14 @@ import React from 'react';
 import { Tag, Shield } from 'lucide-react';
 
 export default function ProductCard({ product, whatsappNumber = '918986043632' }) {
-  const { name, brand, category, description, price, imageUrl, specifications } = product;
+  const { name, brand, category, subCategory, description, price, imageUrl, specifications } = product;
 
   // Build dynamic pre-filled WhatsApp message
   const getWhatsAppLink = () => {
     const text = `Hi Ujjwal Iron, I want to know the latest price and details for:
 - *Product:* ${name}
 - *Brand:* ${brand}
-- *Category:* ${category}
+- *Category:* ${category}${subCategory ? ` (${subCategory})` : ''}
 ${specifications && specifications.length > 0 
   ? `- *Specs:* ${specifications.map(s => `${s.key}: ${s.value}`).join(', ')}` 
   : ''
@@ -22,18 +22,23 @@ Please share the current pricing. Thank you!`;
   };
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:border-slate-350 dark:hover:border-slate-700 hover:shadow-xl dark:hover:shadow-amber-950/20">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xl dark:hover:shadow-amber-950/20">
       
       {/* Brand & Category Badges */}
       <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-2">
-        <span className="flex items-center gap-1 rounded-full bg-amber-50/95 dark:bg-amber-950/80 px-3 py-1 text-xs font-semibold text-amber-650 dark:text-amber-400 backdrop-blur-md border border-amber-200/50 dark:border-amber-900/50">
+        <span className="flex items-center gap-1 rounded-full bg-amber-50/95 dark:bg-amber-950/80 px-3 py-1 text-xs font-semibold text-amber-600 dark:text-amber-400 backdrop-blur-md border border-amber-200/50 dark:border-amber-900/50">
           <Shield size={12} />
           {brand}
         </span>
-        <span className="flex items-center gap-1 rounded-full bg-slate-100/95 dark:bg-slate-950/80 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 backdrop-blur-md border border-slate-200 dark:border-slate-850/50">
+        <span className="flex items-center gap-1 rounded-full bg-slate-100/95 dark:bg-slate-950/80 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 backdrop-blur-md border border-slate-200 dark:border-slate-800/50">
           <Tag size={12} />
           {category}
         </span>
+        {subCategory && (
+          <span className="flex items-center gap-1 rounded-full bg-amber-500/10 dark:bg-amber-500/20 px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 backdrop-blur-md border border-amber-500/30">
+            {subCategory}
+          </span>
+        )}
       </div>
 
       {/* Image Section */}

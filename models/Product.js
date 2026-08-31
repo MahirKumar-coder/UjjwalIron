@@ -10,17 +10,18 @@ const ProductSchema = new mongoose.Schema(
     },
     brand: {
       type: String,
-      required: [true, 'Please provide the brand name (e.g., Tata, Jindal)'],
+      required: [true, 'Please provide the brand name (e.g., Tata, Jindal, SAIL)'],
       trim: true,
     },
     category: {
       type: String,
       required: [true, 'Please provide the category'],
-      enum: {
-        values: ['MS Pipes', 'Roofing Sheets', 'MS Angle & MS Flat', 'GP Pipes', 'Angles & Channels', 'Other'],
-        message: '{VALUE} is not a valid category',
-      },
       trim: true,
+    },
+    subCategory: {
+      type: String,
+      trim: true,
+      default: '',
     },
     description: {
       type: String,

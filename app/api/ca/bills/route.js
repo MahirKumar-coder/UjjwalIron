@@ -42,8 +42,8 @@ export async function POST(request) {
     const body = await request.json();
     const { billNo, gstNo, billDate, pdfUrl, totalAmount } = body;
 
-    if (!billNo || !gstNo || !billDate || !pdfUrl || !totalAmount) {
-      return NextResponse.json({ success: false, error: 'All fields (billNo, gstNo, billDate, pdfUrl, totalAmount) are required.' }, { status: 400 });
+    if (!billNo || !gstNo || !billDate || !pdfUrl) {
+      return NextResponse.json({ success: false, error: 'All fields (billNo, gstNo, billDate, pdfUrl) are required.' }, { status: 400 });
     }
 
     // Verify if customer is registered
@@ -64,7 +64,7 @@ export async function POST(request) {
       customerName: customer.name,
       billDate: new Date(billDate),
       pdfUrl: pdfUrl.trim(),
-      totalAmount: Number(totalAmount),
+      totalAmount: Number(totalAmount) || 0,
       cgst: 0,
       sgst: 0,
       igst: 0,

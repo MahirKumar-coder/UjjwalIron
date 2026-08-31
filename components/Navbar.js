@@ -52,6 +52,7 @@ export default function Navbar({ phone = '+918986043632' }) {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Products', href: '/products' },
+    { name: 'Stainless Steel', href: '/stainless-steel' },
     { name: 'GST Portal', href: '/gst-portal' },
     { name: 'Contact Us', href: '/contact' },
   ];
