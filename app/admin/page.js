@@ -70,11 +70,16 @@ export default function AdminPage() {
   // Form states for Add / Edit Products
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null); // null for "Add", id for "Edit"
+  const [sizeInput, setSizeInput] = useState('');
+  const [weightInput, setWeightInput] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
     category: 'MS Pipes',
     subCategory: '',
+    availableSizes: [],
+    sizeVariants: [],
+    weightPerUnit: '',
     description: '',
     price: 'On Request',
     imageUrl: '',
@@ -787,13 +792,174 @@ export default function AdminPage() {
     }));
   };
 
+  const handleAddSizeVariant = (sizeVal, weightVal) => {
+    const rawSize = typeof sizeVal === 'string' ? sizeVal : sizeInput;
+    const rawWeight = typeof weightVal === 'string' ? weightVal : weightInput;
+    if (!rawSize || !rawSize.trim()) return;
+
+    // Check if input contains comma-separated sizes
+    const splitSizes = rawSize.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+
+    setFormData(prev => {
+      const currentVariants = Array.isArray(prev.sizeVariants) ? [...prev.sizeVariants] : [];
+      
+      splitSizes.forEach(s => {
+        const existingIdx = currentVariants.findIndex(v => v.size.toLowerCase() === s.toLowerCase());
+        const w = (splitSizes.length === 1 && rawWeight) ? rawWeight.trim() : '';
+        if (existingIdx >= 0) {
+          if (w) currentVariants[existingIdx].weight = w;
+        } else {
+          currentVariants.push({ size: s, weight: w });
+        }
+      });
+
+      const availableSizes = currentVariants.map(v => v.size);
+      return { ...prev, sizeVariants: currentVariants, availableSizes };
+    });
+
+    setSizeInput('');
+    setWeightInput('');
+  };
+
+  const handleRemoveSizeVariant = (sizeToRemove) => {
+    setFormData(prev => {
+      const currentVariants = (prev.sizeVariants || []).filter(v => v.size !== sizeToRemove);
+      const availableSizes = currentVariants.map(v => v.size);
+      return { ...prev, sizeVariants: currentVariants, availableSizes };
+    });
+  };
+
+  const handleUpdateVariantWeight = (size, newWeight) => {
+    setFormData(prev => {
+      const currentVariants = (prev.sizeVariants || []).map(v => 
+        v.size === size ? { ...v, weight: newWeight } : v
+      );
+      return { ...prev, sizeVariants: currentVariants };
+    });
+  };
+
+  const getCategorySizeWeightPresets = (cat) => {
+    switch (cat) {
+      case 'MS Pipes':
+      case 'Tata Pipe':
+      case 'HR Pipe':
+      case 'CR Pipe':
+        return [
+          { size: '1/2" (15mm)', weight: '5.2 Kg (6m Length)' },
+          { size: '3/4" (20mm)', weight: '7.6 Kg (6m Length)' },
+          { size: '1" (25mm)', weight: '10.2 Kg (6m Length)' },
+          { size: '1.25" (32mm)', weight: '13.5 Kg (6m Length)' },
+          { size: '1.5" (40mm)', weight: '16.2 Kg (6m Length)' },
+          { size: '2" (50mm)', weight: '21.8 Kg (6m Length)' },
+          { size: '2.5" (65mm)', weight: '31.5 Kg (6m Length)' },
+          { size: '3" (80mm)', weight: '42.0 Kg (6m Length)' },
+          { size: '4" (100mm)', weight: '60.0 Kg (6m Length)' },
+          { size: '5" (125mm)', weight: '85.0 Kg (6m Length)' },
+          { size: '6" (150mm)', weight: '115.0 Kg (6m Length)' },
+          { size: '8" (200mm)', weight: '175.0 Kg (6m Length)' },
+        ];
+      case 'MS Angle':
+        return [
+          { size: '25x25x3mm', weight: '1.1 Kg/Mtr (~6.6 Kg/pc)' },
+          { size: '32x32x3mm', weight: '1.4 Kg/Mtr (~8.4 Kg/pc)' },
+          { size: '35x35x5mm', weight: '2.6 Kg/Mtr (~15.6 Kg/pc)' },
+          { size: '40x40x5mm', weight: '3.0 Kg/Mtr (~18.0 Kg/pc)' },
+          { size: '40x40x6mm', weight: '3.5 Kg/Mtr (~21.0 Kg/pc)' },
+          { size: '50x50x5mm', weight: '3.8 Kg/Mtr (~22.8 Kg/pc)' },
+          { size: '50x50x6mm', weight: '4.5 Kg/Mtr (~27.0 Kg/pc)' },
+          { size: '65x65x6mm', weight: '5.8 Kg/Mtr (~34.8 Kg/pc)' },
+          { size: '75x75x6mm', weight: '6.8 Kg/Mtr (~40.8 Kg/pc)' },
+          { size: '75x75x8mm', weight: '8.9 Kg/Mtr (~53.4 Kg/pc)' },
+          { size: '100x100x10mm', weight: '14.9 Kg/Mtr (~89.4 Kg/pc)' },
+        ];
+      case 'MS Flat':
+        return [
+          { size: '20x3mm', weight: '0.47 Kg/Mtr' },
+          { size: '25x3mm', weight: '0.59 Kg/Mtr' },
+          { size: '25x5mm', weight: '0.98 Kg/Mtr' },
+          { size: '32x5mm', weight: '1.26 Kg/Mtr' },
+          { size: '32x6mm', weight: '1.51 Kg/Mtr' },
+          { size: '40x5mm', weight: '1.57 Kg/Mtr' },
+          { size: '40x6mm', weight: '1.88 Kg/Mtr' },
+          { size: '50x6mm', weight: '2.36 Kg/Mtr' },
+          { size: '50x8mm', weight: '3.14 Kg/Mtr' },
+          { size: '65x6mm', weight: '3.06 Kg/Mtr' },
+          { size: '75x10mm', weight: '5.89 Kg/Mtr' },
+          { size: '100x10mm', weight: '7.85 Kg/Mtr' },
+        ];
+      case 'MS Channel':
+        return [
+          { size: '75x40mm', weight: '6.8 Kg/Mtr (~40.8 Kg/pc)' },
+          { size: '100x50mm', weight: '9.2 Kg/Mtr (~55.2 Kg/pc)' },
+          { size: '125x65mm', weight: '12.8 Kg/Mtr (~76.8 Kg/pc)' },
+          { size: '150x75mm', weight: '16.4 Kg/Mtr (~98.4 Kg/pc)' },
+          { size: '200x75mm', weight: '22.3 Kg/Mtr (~133.8 Kg/pc)' },
+          { size: '250x80mm', weight: '30.4 Kg/Mtr (~182.4 Kg/pc)' },
+          { size: '300x90mm', weight: '35.9 Kg/Mtr (~215.4 Kg/pc)' },
+        ];
+      case 'MS Bar':
+        return [
+          { size: '8mm', weight: '0.395 Kg/Mtr (~4.74 Kg/12m)' },
+          { size: '10mm', weight: '0.617 Kg/Mtr (~7.40 Kg/12m)' },
+          { size: '12mm', weight: '0.888 Kg/Mtr (~10.65 Kg/12m)' },
+          { size: '16mm', weight: '1.58 Kg/Mtr (~18.96 Kg/12m)' },
+          { size: '20mm', weight: '2.47 Kg/Mtr (~29.64 Kg/12m)' },
+          { size: '25mm', weight: '3.85 Kg/Mtr (~46.20 Kg/12m)' },
+          { size: '28mm', weight: '4.83 Kg/Mtr (~57.96 Kg/12m)' },
+          { size: '32mm', weight: '6.31 Kg/Mtr (~75.72 Kg/12m)' },
+        ];
+      case 'Tata Sheet':
+      case 'Jindal Sheet':
+        return [
+          { size: '8x4 ft (0.35mm)', weight: 'Approx. 7.8 Kg/Sheet' },
+          { size: '10x4 ft (0.35mm)', weight: 'Approx. 9.8 Kg/Sheet' },
+          { size: '12x4 ft (0.40mm)', weight: 'Approx. 13.5 Kg/Sheet' },
+          { size: '14x4 ft (0.45mm)', weight: 'Approx. 17.8 Kg/Sheet' },
+          { size: '16x4 ft (0.50mm)', weight: 'Approx. 22.5 Kg/Sheet' },
+          { size: '8x4 ft (0.50mm)', weight: 'Approx. 11.2 Kg/Sheet' },
+          { size: '10x4 ft (0.50mm)', weight: 'Approx. 14.0 Kg/Sheet' },
+        ];
+      case 'MS Plate':
+        return [
+          { size: '4mm', weight: '31.4 Kg/sq.m' },
+          { size: '5mm', weight: '39.25 Kg/sq.m' },
+          { size: '6mm', weight: '47.10 Kg/sq.m' },
+          { size: '8mm', weight: '62.80 Kg/sq.m' },
+          { size: '10mm', weight: '78.50 Kg/sq.m' },
+          { size: '12mm', weight: '94.20 Kg/sq.m' },
+          { size: '16mm', weight: '125.60 Kg/sq.m' },
+          { size: '20mm', weight: '157.00 Kg/sq.m' },
+          { size: '25mm', weight: '196.25 Kg/sq.m' },
+          { size: '32mm', weight: '251.20 Kg/sq.m' },
+        ];
+      case 'Chaukhat':
+        return [
+          { size: '7x3 ft (Single)', weight: 'Approx. 18.5 Kg/Frame' },
+          { size: '7x3.5 ft (Single)', weight: 'Approx. 20.0 Kg/Frame' },
+          { size: '7x4 ft (Double)', weight: 'Approx. 24.5 Kg/Frame' },
+          { size: '8x3.5 ft (Grand)', weight: 'Approx. 23.0 Kg/Frame' },
+          { size: '8x4 ft (Double Grand)', weight: 'Approx. 28.0 Kg/Frame' },
+        ];
+      default:
+        return [
+          { size: 'Standard Size', weight: 'Standard Weight' },
+          { size: 'Custom Cut', weight: 'Custom' },
+        ];
+    }
+  };
+
   const openAddModal = () => {
     setEditingId(null);
+    setSizeInput('');
+    setWeightInput('');
     setFormData({
       name: '',
       brand: '',
       category: 'MS Pipes',
       subCategory: '',
+      availableSizes: [],
+      sizeVariants: [],
+      weightPerUnit: '',
       description: '',
       price: 'On Request',
       imageUrl: '',
@@ -808,11 +974,25 @@ export default function AdminPage() {
 
   const openEditModal = (prod) => {
     setEditingId(prod._id);
+    setSizeInput('');
+    setWeightInput('');
+    
+    // Normalize sizeVariants if only availableSizes exists
+    let variants = [];
+    if (prod.sizeVariants && prod.sizeVariants.length > 0) {
+      variants = prod.sizeVariants.map(v => ({ size: v.size, weight: v.weight || '' }));
+    } else if (prod.availableSizes && prod.availableSizes.length > 0) {
+      variants = prod.availableSizes.map(s => ({ size: s, weight: '' }));
+    }
+
     setFormData({
       name: prod.name,
       brand: prod.brand,
       category: prod.category,
       subCategory: prod.subCategory || '',
+      availableSizes: prod.availableSizes || variants.map(v => v.size),
+      sizeVariants: variants,
+      weightPerUnit: prod.weightPerUnit || '',
       description: prod.description || '',
       price: prod.price || 'On Request',
       imageUrl: prod.imageUrl || '',
@@ -1216,6 +1396,11 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                               <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
                                 <Shield size={10} /> Brand: {prod.brand}
                               </span>
+                              {prod.availableSizes && prod.availableSizes.length > 0 && (
+                                <span className="text-3xs text-amber-600 dark:text-amber-400 font-semibold mt-1 flex items-center gap-1">
+                                  <Tag size={9} /> Sizes ({prod.availableSizes.length}): {prod.availableSizes.slice(0, 3).join(', ')}{prod.availableSizes.length > 3 ? ` (+${prod.availableSizes.length - 3})` : ''}
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className="px-6 py-4">
@@ -2089,23 +2274,33 @@ We would like to share the latest wholesale rates and specifications. Let us kno
           </div>
         )}
 
-        {/* Modal Form for Add/Edit Products */}
+        {/* Modal Form for Add/Edit Products (Responsive, Non-Cutting, Sticky Header/Footer) */}
         {isFormOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-            <div className="relative w-full max-w-2xl rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-2xl my-8 text-slate-900 dark:text-slate-100">
-              {/* Close Button */}
-              <button
-                onClick={() => setIsFormOpen(false)}
-                className="absolute right-4 top-4 rounded-xl p-2 text-slate-450 hover:bg-slate-105 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
-              >
-                <X size={20} />
-              </button>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-3 sm:p-6 overflow-hidden">
+            <div className="relative w-full max-w-2xl max-h-[92vh] flex flex-col rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden text-slate-900 dark:text-slate-100">
+              
+              {/* Sticky Modal Header */}
+              <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shrink-0">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                    {editingId ? 'Edit Product Catalog Details' : 'Add New Catalog Product'}
+                  </h2>
+                  <p className="text-2xs sm:text-xs text-slate-500 mt-0.5">
+                    Configure product specifications, available sizes, and weight charts.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsFormOpen(false)}
+                  className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  title="Close modal"
+                >
+                  <X size={20} />
+                </button>
+              </div>
 
-              <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-6">
-                {editingId ? 'Edit Product Catalog Details' : 'Add New Catalog Product'}
-              </h2>
-
-              <form onSubmit={handleFormSubmit} className="space-y-4">
+              {/* Scrollable Modal Form Body */}
+              <form id="admin-product-form" onSubmit={handleFormSubmit} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Name */}
                   <div>
@@ -2118,7 +2313,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       required
                       value={formData.name}
                       onChange={handleFormChange}
-                      placeholder="e.g. MS Pipe 3 Inch Heavy"
+                      placeholder="e.g. MS Round Pipe Heavy"
                       className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
@@ -2134,7 +2329,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       required
                       value={formData.brand}
                       onChange={handleFormChange}
-                      placeholder="e.g. Tata Structura"
+                      placeholder="e.g. Tata Structura, Jindal Star"
                       className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
@@ -2194,9 +2389,158 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   </div>
                 </div>
 
+                {/* Available Sizes & Weights Manager */}
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10 p-4 sm:p-5 space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                        Available Sizes & Weights (उपलब्ध साइज़ और वजन)
+                      </label>
+                      <p className="text-3xs text-slate-500 dark:text-slate-400">
+                        Customers can view sizes, check unit weights, calculate total tonnage, and inquire directly via WhatsApp.
+                      </p>
+                    </div>
+                    <span className="text-2xs font-mono font-bold text-amber-700 dark:text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-md self-start sm:self-auto">
+                      {(formData.sizeVariants?.length || formData.availableSizes?.length || 0)} Variants Added
+                    </span>
+                  </div>
+
+                  {/* Size & Weight Input Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <div className="sm:col-span-6">
+                      <input
+                        type="text"
+                        value={sizeInput}
+                        onChange={(e) => setSizeInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddSizeVariant();
+                          }
+                        }}
+                        placeholder='Size (e.g. 1" (25mm) or 40x40x6mm)'
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:border-amber-500 focus:outline-none"
+                      />
+                    </div>
+                    <div className="sm:col-span-4">
+                      <input
+                        type="text"
+                        value={weightInput}
+                        onChange={(e) => setWeightInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddSizeVariant();
+                          }
+                        }}
+                        placeholder='Weight (e.g. 10.2 Kg/pc)'
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:border-amber-500 focus:outline-none"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <button
+                        type="button"
+                        onClick={() => handleAddSizeVariant()}
+                        className="w-full h-full rounded-xl bg-amber-600 hover:bg-amber-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm transition-colors"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Active Selected Size-Weight List */}
+                  {formData.sizeVariants && formData.sizeVariants.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[160px] overflow-y-auto pr-1">
+                      {formData.sizeVariants.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 text-xs shadow-xs"
+                        >
+                          <div className="flex flex-col min-w-0 pr-2">
+                            <span className="font-bold text-slate-900 dark:text-white truncate">{item.size}</span>
+                            <span className="text-2xs text-amber-600 dark:text-amber-400 font-medium">
+                              {item.weight || 'Weight on Request'}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSizeVariant(item.size)}
+                            className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
+                            title="Remove variant"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : formData.availableSizes && formData.availableSizes.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {formData.availableSizes.map((sz, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2.5 py-1 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-xs"
+                        >
+                          <span>{sz}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSizeVariant(sz)}
+                            className="text-slate-400 hover:text-rose-500 ml-1"
+                          >
+                            &times;
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-3xs italic text-slate-400">No sizes/weights added yet. Click any quick preset below or type above.</p>
+                  )}
+
+                  {/* Category-smart Quick Add Presets */}
+                  <div className="pt-2 border-t border-amber-500/20">
+                    <span className="text-3xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 block mb-1.5">
+                      Quick Add Popular {formData.category} Sizes with Standard Weights (1-Click Add):
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {getCategorySizeWeightPresets(formData.category).map((preset) => {
+                        const isAdded = formData.sizeVariants?.some(v => v.size === preset.size) || formData.availableSizes?.includes(preset.size);
+                        return (
+                          <button
+                            key={preset.size}
+                            type="button"
+                            onClick={() => handleAddSizeVariant(preset.size, preset.weight)}
+                            className={`px-2.5 py-1 text-2xs font-semibold rounded-lg border transition-all ${
+                              isAdded
+                                ? 'bg-amber-500/20 border-amber-500/40 text-amber-700 dark:text-amber-300 opacity-60 cursor-default'
+                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400'
+                            }`}
+                            title={`Add ${preset.size} (${preset.weight})`}
+                          >
+                            {isAdded ? `✓ ${preset.size}` : `+ ${preset.size}`}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* General Weight / Density Input */}
+                  <div className="pt-2 border-t border-amber-500/20">
+                    <label className="block text-2xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                      General Unit Weight / Note (वजन विवरण)
+                    </label>
+                    <input
+                      type="text"
+                      name="weightPerUnit"
+                      value={formData.weightPerUnit || ''}
+                      onChange={handleFormChange}
+                      placeholder="e.g. Standard 6-meter bundle weight or 7.85 g/cm³"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
                 {/* Image Upload & URL Override */}
                 <div className="space-y-3">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                     Product Image
                   </label>
                   
@@ -2240,7 +2584,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           </button>
                         )}
                       </div>
-                      <p className="text-3xs text-slate-450 dark:text-slate-500">
+                      <p className="text-3xs text-slate-400 dark:text-slate-500">
                         Supports PNG, JPG, JPEG, WEBP. Max 5MB.
                       </p>
                     </div>
@@ -2248,7 +2592,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
 
                   {/* Fallback Manual URL Input (for flexibility) */}
                   <div className="pt-1">
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
+                    <label className="block text-3xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
                       Or Paste Image Link manually
                     </label>
                     <input
@@ -2300,19 +2644,19 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           placeholder="Spec Key (e.g. Thickness)"
                           value={spec.key}
                           onChange={(e) => handleSpecChange(index, 'key', e.target.value)}
-                          className="flex-1 rounded-xl border border-slate-200 dark:border-slate-850 bg-slate-100 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                          className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
                         />
                         <input
                           type="text"
                           placeholder="Spec Value (e.g. 2.5 mm)"
                           value={spec.value}
                           onChange={(e) => handleSpecChange(index, 'value', e.target.value)}
-                          className="flex-1 rounded-xl border border-slate-200 dark:border-slate-855 bg-slate-100 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                          className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
                         />
                         <button
                           type="button"
                           onClick={() => removeSpecField(index)}
-                          className="p-2 text-slate-450 hover:text-rose-600 rounded"
+                          className="p-2 text-slate-400 hover:text-rose-600 rounded"
                         >
                           <X size={14} />
                         </button>
@@ -2335,26 +2679,28 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     Show product in user catalog (Active)
                   </label>
                 </div>
-
-                {/* Submit Action Buttons */}
-                <div className="flex gap-3 justify-end pt-4 border-t border-slate-200 dark:border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => setIsFormOpen(false)}
-                    className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 px-5 py-3 text-sm font-bold text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-white"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-lg hover:bg-amber-500 disabled:opacity-50"
-                  >
-                    <Save size={16} />
-                    <span>{loading ? 'Saving...' : 'Save Product'}</span>
-                  </button>
-                </div>
               </form>
+
+              {/* Sticky Modal Footer */}
+              <div className="flex items-center justify-end gap-3 px-5 sm:px-6 py-3.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsFormOpen(false)}
+                  className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  form="admin-product-form"
+                  disabled={loading}
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-500 px-6 py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg transition-all active:scale-95 disabled:opacity-50"
+                >
+                  <Save size={16} />
+                  <span>{loading ? 'Saving...' : editingId ? 'Update Product' : 'Save Product'}</span>
+                </button>
+              </div>
+
             </div>
           </div>
         )}

@@ -23,6 +23,21 @@ const ProductSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    availableSizes: {
+      type: [String],
+      default: [],
+    },
+    sizeVariants: [
+      {
+        size: { type: String, required: true },
+        weight: { type: String, default: '' },
+      },
+    ],
+    weightPerUnit: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     description: {
       type: String,
       trim: true,
