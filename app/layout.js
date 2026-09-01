@@ -8,9 +8,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata = {
   title: 'Ujjwal Iron | Premium Steel Supplier & Distributor in Patna',
   description:
-    'Ujjwal Iron is Patna\'s premier supplier of MS Pipes, Tata & Jindal Sheets, HR/CR Pipes, MS Angles, Flats, Channels, MS Plates, Chaukhats, and Stainless Steel. Authorized dealer of Tata Structura, Jindal Star, and SAIL.',
+    'Ujjwal Iron is Patna\'s premier supplier of MS Pipes, Tata & Jindal Sheets, HR/CR Sheet, MS Angles, Flats, Channels, MS Plates, Tata Chaukhats, and Stainless Steel. Authorized dealer of Tata Structura, Jindal Star, and SAIL.',
   keywords:
-    'Ujjwal Iron, Steel Supplier Patna, MS Pipes Patna, Tata Sheet Patna, Jindal Sheet Patna, HR Pipe, CR Pipe, MS Angle Patna, MS Flat, MS Channel, Stainless Steel Patna, SS 304, SS 202, Steel Dealer Patna',
+    'Ujjwal Iron, Steel Supplier Patna, MS Pipes Patna, Tata Sheet Patna, Jindal Sheet Patna, HR Sheets, CR Pipe, MS Angle Patna, MS Flat, MS Channel, Stainless Steel Patna, SS 304, SS 202, Steel Dealer Patna',
   icons: {
     icon: '/images/logo.jpg',
   },

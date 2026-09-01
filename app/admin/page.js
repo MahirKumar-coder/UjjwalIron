@@ -459,7 +459,7 @@ export default function AdminPage() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(71, 85, 105); // slate-600
-      doc.text('Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Pipes, Angles, Flats & Channels', 42, currentY + 11);
+      doc.text('Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Sheet, Angles, Flats & Channels', 42, currentY + 11);
       doc.text('Address: Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011', 42, currentY + 16);
       doc.text('Mobile: +91 8986043632 | Email: sales@ujjwaliron.com', 42, currentY + 21);
 
@@ -842,7 +842,7 @@ export default function AdminPage() {
     switch (cat) {
       case 'MS Pipes':
       case 'Tata Pipe':
-      case 'HR Pipe':
+      case 'HR Sheets':
       case 'CR Pipe':
         return [
           { size: '1/2" (15mm)', weight: '5.2 Kg (6m Length)' },
@@ -932,7 +932,7 @@ export default function AdminPage() {
           { size: '25mm', weight: '196.25 Kg/sq.m' },
           { size: '32mm', weight: '251.20 Kg/sq.m' },
         ];
-      case 'Chaukhat':
+      case 'Tata Chaukhat':
         return [
           { size: '7x3 ft (Single)', weight: 'Approx. 18.5 Kg/Frame' },
           { size: '7x3.5 ft (Single)', weight: 'Approx. 20.0 Kg/Frame' },
@@ -1147,7 +1147,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
   const categories = [
     'MS Pipes',
     'Tata Pipe',
-    'HR Pipe',
+    'HR Sheets',
     'CR Pipe',
     'Tata Sheet',
     'Jindal Sheet',
@@ -1156,7 +1156,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
     'MS Channel',
     'MS Bar',
     'MS Plate',
-    'Chaukhat',
+    'Tata Chaukhat',
     'Other'
   ];
   const newLeadsCount = inquiries.filter(i => i.status === 'New').length;
@@ -1898,7 +1898,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                   <div className="flex justify-between items-start pb-6 border-b border-slate-200">
                     <div>
                       <h2 className="text-2xl font-black tracking-tight text-slate-900">UJJWAL IRON</h2>
-                      <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Pipes, Angles, Flats & Channels</p>
+                      <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Sheet, Angles, Flats & Channels</p>
                       <p className="text-[10px] text-slate-600 mt-2">Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011</p>
                       <p className="text-[10px] text-slate-600 mt-0.5">Mobile: +91 8986043632 | Email: sales@ujjwaliron.com</p>
                     </div>

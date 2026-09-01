@@ -60,7 +60,7 @@ export default async function ProductsPage({ searchParams }) {
     { name: 'All Products', value: '' },
     { name: 'MS Pipes', value: 'MS Pipes' },
     { name: 'Tata Pipe', value: 'Tata Pipe' },
-    { name: 'HR Pipe', value: 'HR Pipe' },
+    { name: 'HR Sheets', value: 'HR Sheets' },
     { name: 'CR Pipe', value: 'CR Pipe' },
     { name: 'Tata Sheet', value: 'Tata Sheet' },
     { name: 'Jindal Sheet', value: 'Jindal Sheet' },
@@ -69,7 +69,7 @@ export default async function ProductsPage({ searchParams }) {
     { name: 'MS Channel', value: 'MS Channel' },
     { name: 'MS Bar', value: 'MS Bar' },
     { name: 'MS Plate', value: 'MS Plate' },
-    { name: 'Chaukhat', value: 'Chaukhat' },
+    { name: 'Tata Chaukhat', value: 'Tata Chaukhat' },
     { name: 'Other', value: 'Other' },
   ];
 
@@ -94,7 +94,7 @@ export default async function ProductsPage({ searchParams }) {
             Digital Product Catalog
           </h1>
           <p className="mt-2.5 sm:mt-4 text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed px-2">
-            Explore our industrial range of MS Pipes, Tata & Jindal Sheets, HR/CR Pipes, Angles, Channels, MS Bars, and Chaukhats.
+            Explore our industrial range of MS Pipes, Tata & Jindal Sheets, HR/CR Sheet, Angles, Channels, MS Bars, and Tata Chaukhats.
           </p>
         </div>
 

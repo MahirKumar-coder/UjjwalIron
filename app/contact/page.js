@@ -46,7 +46,7 @@ export default function ContactPage() {
                 Established in Patna, Ujjwal Iron has grown from a local merchant yard into one of Bihar’s most reliable suppliers of structural and industrial steel products. We serve contractors, developers, and retailers with transparency and efficiency.
               </p>
               <p>
-                As authorized dealers of prominent manufacturers, we ensure that every batch of MS Pipes, Tata & Jindal Sheets, HR/CR Pipes, Angles, Flats, and Channels conforms to standard industry parameters and carries authentic manufacturer test certificates.
+                As authorized dealers of prominent manufacturers, we ensure that every batch of MS Pipes, Tata & Jindal Sheets, HR/CR Sheet, Angles, Flats, and Channels conforms to standard industry parameters and carries authentic manufacturer test certificates.
               </p>
             </div>
 

@@ -43,7 +43,7 @@ export default function Home() {
       href: '/products?category=Tata+Sheet'
     },
     {
-      title: 'HR Pipe & CR Pipe',
+      title: 'HR Sheets & CR Pipe',
       desc: 'Hot Rolled and Cold Rolled precision pipes for automotive, furniture, and engineering fabrication.',
       brands: 'Jindal, Tata, High-Grade Mills',
       icon: <Box className="h-5 w-5 text-amber-500" />,
@@ -67,8 +67,8 @@ export default function Home() {
       href: '/products?category=MS+Flat'
     },
     {
-      title: 'Tata Pipe & Chaukhat',
-      desc: 'Premium Tata brand pipes and standard steel door chaukhat frames for residential & commercial building.',
+      title: 'Tata Pipe & Tata Chaukhat',
+      desc: 'Premium Tata brand pipes and standard steel door Tata Chaukhat frames for residential & commercial building.',
       brands: 'Tata Structura, Ujjwal Fabricated',
       icon: <Building2 className="h-5 w-5 text-amber-500" />,
       imageUrl: '/images/cat_structural_steel.jpg',
@@ -141,7 +141,7 @@ export default function Home() {
 
               {/* Description */}
               <p className="mt-6 max-w-lg text-lg text-slate-600 dark:text-slate-400 sm:text-xl">
-                Authorized dealers of Tata Structura, Jindal Star, and SAIL. We supply high-grade MS Pipes, Tata/Jindal Sheets, HR/CR Pipes, Angles, Flats & Channels with fast, direct-to-site delivery.
+                Authorized dealers of Tata Structura, Jindal Star, and SAIL. We supply high-grade MS Pipes, Tata/Jindal Sheets, HR/CR Sheet, Angles, Flats & Channels with fast, direct-to-site delivery.
               </p>
 
               {/* Call to Actions */}
