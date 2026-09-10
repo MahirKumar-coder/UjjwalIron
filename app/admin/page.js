@@ -47,7 +47,7 @@ export default function AdminPage() {
     gstNo: '',
     date: '',
     validityDays: 1,
-    items: [{ name: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+    items: [{ productId: '', name: '', size: '', brand: '', availableProductSizes: [], qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
     cgst: 0,
     sgst: 0,
     igst: 0,
@@ -222,7 +222,7 @@ export default function AdminPage() {
       gstNo: '',
       date: new Date().toISOString().slice(0, 10),
       validityDays: 1,
-      items: [{ name: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+      items: [{ productId: '', name: '', size: '', brand: '', availableProductSizes: [], qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
       cgst: 0,
       sgst: 0,
       igst: 0,
@@ -248,13 +248,28 @@ export default function AdminPage() {
       gstNo: quote.gstNo || '',
       date: new Date(quote.date).toISOString().slice(0, 10),
       validityDays: quote.validityDays || 1,
-      items: quote.items.map(item => ({
-        name: item.name,
-        qty: item.qty,
-        unit: item.unit || 'Pcs',
-        rate: item.rate,
-        total: item.total
-      })),
+      items: (quote.items || []).map(item => {
+        const linkedProd = products.find(p => p._id === item.productId || p.name === item.name);
+        let productSizes = [];
+        if (linkedProd) {
+          if (linkedProd.sizeVariants && linkedProd.sizeVariants.length > 0) {
+            productSizes = linkedProd.sizeVariants.map(v => v.size + (v.weight ? ` [${v.weight}]` : ''));
+          } else if (linkedProd.availableSizes && linkedProd.availableSizes.length > 0) {
+            productSizes = [...linkedProd.availableSizes];
+          }
+        }
+        return {
+          productId: item.productId || linkedProd?._id || '',
+          name: item.name,
+          size: item.size || '',
+          brand: item.brand || linkedProd?.brand || '',
+          availableProductSizes: productSizes,
+          qty: item.qty,
+          unit: item.unit || 'Pcs',
+          rate: item.rate,
+          total: item.total
+        };
+      }),
       cgst: quote.cgst || 0,
       sgst: quote.sgst || 0,
       igst: quote.igst || 0,
@@ -330,7 +345,20 @@ export default function AdminPage() {
   const addQuotationItemRow = () => {
     setQuotationFormData(prev => ({
       ...prev,
-      items: [...prev.items, { name: '', qty: 1, unit: 'Pcs', rate: 0, total: 0 }]
+      items: [
+        ...prev.items,
+        {
+          productId: '',
+          name: '',
+          size: '',
+          brand: '',
+          availableProductSizes: [],
+          qty: 1,
+          unit: 'Pcs',
+          rate: 0,
+          total: 0
+        }
+      ]
     }));
   };
 
@@ -345,7 +373,7 @@ export default function AdminPage() {
   const handleQuotationItemChange = (index, field, value) => {
     const updatedItems = [...quotationFormData.items];
     updatedItems[index][field] = field === 'qty' || field === 'rate' ? Number(value) : value;
-    updatedItems[index].total = updatedItems[index].qty * updatedItems[index].rate;
+    updatedItems[index].total = Number(updatedItems[index].qty || 0) * Number(updatedItems[index].rate || 0);
     setQuotationFormData(prev => ({
       ...prev,
       items: updatedItems
@@ -353,16 +381,39 @@ export default function AdminPage() {
   };
 
   const handleProductSelect = (index, prodId) => {
-    const prod = products.find(p => p._id === prodId);
-    if (!prod) return;
-
     const updatedItems = [...quotationFormData.items];
-    const specText = prod.specifications && prod.specifications.length > 0
-      ? prod.specifications.map(s => `${s.key}: ${s.value}`).join(', ')
-      : '';
-    const brandText = prod.brand ? ` (${prod.brand}${specText ? `, ${specText}` : ''})` : (specText ? ` (${specText})` : '');
-    updatedItems[index].name = `${prod.name}${brandText}`;
+    const prod = products.find(p => p._id === prodId);
     
+    if (!prod) {
+      updatedItems[index].productId = '';
+      updatedItems[index].size = '';
+      updatedItems[index].brand = '';
+      updatedItems[index].availableProductSizes = [];
+      setQuotationFormData(prev => ({ ...prev, items: updatedItems }));
+      return;
+    }
+
+    // Extract available sizes from product
+    let productSizes = [];
+    if (prod.sizeVariants && prod.sizeVariants.length > 0) {
+      productSizes = prod.sizeVariants.map(v => v.size + (v.weight ? ` [${v.weight}]` : ''));
+    } else if (prod.availableSizes && prod.availableSizes.length > 0) {
+      productSizes = [...prod.availableSizes];
+    } else {
+      productSizes = getCategorySizeWeightPresets(prod.category).map(p => p.size + (p.weight ? ` [${p.weight}]` : ''));
+    }
+
+    const firstRawSize = prod.sizeVariants?.[0]?.size || prod.availableSizes?.[0] || '';
+    
+    updatedItems[index].productId = prod._id;
+    updatedItems[index].brand = prod.brand || '';
+    updatedItems[index].size = firstRawSize;
+    updatedItems[index].availableProductSizes = productSizes;
+    
+    const sizeDisplay = firstRawSize ? ` - ${firstRawSize}` : '';
+    const brandDisplay = prod.brand ? ` (${prod.brand})` : '';
+    updatedItems[index].name = `${prod.name}${sizeDisplay}${brandDisplay}`;
+
     let estRate = 0;
     if (prod.price && prod.price !== 'On Request') {
       const match = prod.price.match(/\d+[\d,.]*/);
@@ -371,7 +422,28 @@ export default function AdminPage() {
       }
     }
     updatedItems[index].rate = estRate;
-    updatedItems[index].total = estRate * updatedItems[index].qty;
+    updatedItems[index].total = estRate * (Number(updatedItems[index].qty) || 1);
+
+    setQuotationFormData(prev => ({
+      ...prev,
+      items: updatedItems
+    }));
+  };
+
+  const handleSizeSelect = (index, selectedSize) => {
+    const updatedItems = [...quotationFormData.items];
+    
+    // Clean size name if it has [weight] attached
+    const cleanSize = selectedSize.replace(/\s*\[.*?\]\s*/g, '').trim();
+    updatedItems[index].size = cleanSize;
+
+    // If item was chosen from a product, update the item name nicely
+    const prod = products.find(p => p._id === updatedItems[index].productId);
+    if (prod) {
+      const sizeDisplay = cleanSize ? ` - ${cleanSize}` : '';
+      const brandDisplay = prod.brand ? ` (${prod.brand})` : '';
+      updatedItems[index].name = `${prod.name}${sizeDisplay}${brandDisplay}`;
+    }
 
     setQuotationFormData(prev => ({
       ...prev,
@@ -2093,52 +2165,96 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       {quotationFormData.items.map((item, index) => (
                         <div 
                           key={index} 
-                          className="flex flex-col md:flex-row items-stretch md:items-center gap-3 bg-slate-50/50 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
+                          className="flex flex-col gap-3 bg-slate-50/70 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
                         >
-                          {/* Sync dropdown */}
-                          <div className="w-full md:w-44 shrink-0">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Select from Catalog</label>
-                            <select
-                              onChange={(e) => handleProductSelect(index, e.target.value)}
-                              defaultValue=""
-                              className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
-                            >
-                              <option value="">-- Custom (or pick product) --</option>
-                              {products.filter(p => p.isActive).map(p => (
-                                <option key={p._id} value={p._id}>{p.name} ({p.brand})</option>
-                              ))}
-                            </select>
+                          {/* Row 1: Product Selector, Size Selector & Material Description */}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                            {/* 1. Catalog Product Dropdown */}
+                            <div className="md:col-span-4">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                                1. Select Product from Catalog
+                              </label>
+                              <select
+                                value={item.productId || ''}
+                                onChange={(e) => handleProductSelect(index, e.target.value)}
+                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 font-semibold focus:border-amber-500 focus:outline-none"
+                              >
+                                <option value="">-- Pick from Catalog (or Custom) --</option>
+                                {products.filter(p => p.isActive).map(p => (
+                                  <option key={p._id} value={p._id}>
+                                    {p.name} ({p.brand}) {p.sizeVariants?.length ? `• ${p.sizeVariants.length} Sizes` : ''}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            {/* 2. Size Selector Dropdown / Custom Input */}
+                            <div className="md:col-span-3">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-1 flex items-center justify-between">
+                                <span>2. Select Size (साइज़)</span>
+                                {item.availableProductSizes?.length > 0 && (
+                                  <span className="text-3xs font-mono font-normal text-slate-400">({item.availableProductSizes.length} sizes)</span>
+                                )}
+                              </label>
+                              {item.availableProductSizes && item.availableProductSizes.length > 0 ? (
+                                <select
+                                  value={item.size || ''}
+                                  onChange={(e) => handleSizeSelect(index, e.target.value)}
+                                  className="w-full rounded-xl border border-amber-500/40 bg-amber-50/50 dark:bg-amber-950/20 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 font-bold focus:border-amber-500 focus:outline-none"
+                                >
+                                  <option value="">-- Choose Size --</option>
+                                  {item.availableProductSizes.map((sz, sIdx) => (
+                                    <option key={sIdx} value={sz}>{sz}</option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={item.size || ''}
+                                  onChange={(e) => handleSizeSelect(index, e.target.value)}
+                                  placeholder='e.g. 1" (25mm) or 40x40x6mm'
+                                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                                />
+                              )}
+                            </div>
+
+                            {/* 3. Final Material Description on Quotation */}
+                            <div className="md:col-span-5">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                                Material Description on Quotation *
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={item.name}
+                                onChange={(e) => handleQuotationItemChange(index, 'name', e.target.value)}
+                                placeholder="e.g. MS Round Pipe - 1 Inch (Tata)"
+                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 font-medium focus:border-amber-500 focus:outline-none"
+                              />
+                            </div>
                           </div>
 
-                          {/* Item Details */}
-                          <div className="flex-grow">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Item Name *</label>
-                            <input
-                              type="text"
-                              required
-                              value={item.name}
-                              onChange={(e) => handleQuotationItemChange(index, 'name', e.target.value)}
-                                                 className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
-                            />
-                          </div>
-
-                          {/* Unit / Qty / Rate / Total */}
-                          <div className="grid grid-cols-4 gap-2 w-full md:w-96 shrink-0">
-                            <div>
+                          {/* Row 2: Unit, Qty, Rate, Total, Delete */}
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                            <div className="sm:col-span-3">
                               <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Unit</label>
                               <select
                                 value={item.unit}
                                 onChange={(e) => handleQuotationItemChange(index, 'unit', e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
                               >
-                                <option value="Pcs">Pcs</option>
-                                <option value="Tons">Tons</option>
-                                <option value="Kgs">Kgs</option>
-                                <option value="Meters">Mtr</option>
-                                <option value="Bundles">Bundle</option>
+                                <option value="Pcs">Pcs (नग)</option>
+                                <option value="Tons">Tons (टन)</option>
+                                <option value="Kgs">Kgs (किलो)</option>
+                                <option value="Meters">Mtr (मीटर)</option>
+                                <option value="Feet">Feet (फीट)</option>
+                                <option value="Bundles">Bundle (बंडल)</option>
+                                <option value="Sheets">Sheet (शीट)</option>
+                                <option value="Frames">Frame (चौखट)</option>
                               </select>
                             </div>
-                            <div>
+
+                            <div className="sm:col-span-2">
                               <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Qty *</label>
                               <input
                                 type="number"
@@ -2147,11 +2263,12 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 step="any"
                                 value={item.qty}
                                 onChange={(e) => handleQuotationItemChange(index, 'qty', e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono"
+                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono font-bold"
                               />
                             </div>
-                            <div>
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Rate *</label>
+
+                            <div className="sm:col-span-3">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Rate / Unit (₹) *</label>
                               <input
                                 type="number"
                                 required
@@ -2159,28 +2276,28 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 step="any"
                                 value={item.rate}
                                 onChange={(e) => handleQuotationItemChange(index, 'rate', e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono"
+                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono font-bold"
                               />
                             </div>
-                            <div>
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Total (₹)</label>
-                              <div className="w-full text-right font-mono text-xs px-2 py-2.5 font-bold text-slate-800 dark:text-slate-200 truncate">
-                                ₹{(item.qty * item.rate).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+
+                            <div className="sm:col-span-3">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Line Total (₹)</label>
+                              <div className="w-full text-right font-mono text-sm px-3 py-1.5 font-black text-amber-600 dark:text-amber-400 truncate">
+                                ₹{(Number(item.qty || 0) * Number(item.rate || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </div>
                             </div>
-                          </div>
 
-                          {/* Delete row */}
-                          <div className="flex items-center justify-end md:pt-4">
-                            <button
-                              type="button"
-                              onClick={() => removeQuotationItemRow(index)}
-                              disabled={quotationFormData.items.length === 1}
-                              className="p-2 text-slate-400 hover:text-rose-500 disabled:opacity-30 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                              title="Delete Row"
-                            >
-                              <X size={14} />
-                            </button>
+                            <div className="sm:col-span-1 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={() => removeQuotationItemRow(index)}
+                                disabled={quotationFormData.items.length === 1}
+                                className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors disabled:opacity-30"
+                                title="Remove row"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}
