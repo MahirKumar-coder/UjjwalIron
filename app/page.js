@@ -71,7 +71,7 @@ export default function Home() {
       desc: 'Premium Tata brand pipes and standard steel door Tata Chaukhat frames for residential & commercial building.',
       brands: 'Tata Structura, Ujjwal Fabricated',
       icon: <Building2 className="h-5 w-5 text-amber-500" />,
-      imageUrl: '/images/cat_structural_steel.jpg',
+      imageUrl: '/images/product-jpeg-1000x1000.jpg',
       href: '/products?category=Tata+Pipe'
     },
     {
@@ -87,7 +87,7 @@ export default function Home() {
       desc: 'Dedicated stainless steel division: SS pipes, sheets, rods, angles, and designer railing accessories.',
       brands: 'Jindal Stainless, Salem Steel',
       icon: <Sparkles className="h-5 w-5 text-amber-500" />,
-      imageUrl: '/images/cat_structural_steel.jpg',
+      imageUrl: '/images/OIP.webp',
       href: '/stainless-steel'
     }
   ];

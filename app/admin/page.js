@@ -461,7 +461,7 @@ export default function AdminPage() {
       doc.setTextColor(71, 85, 105); // slate-600
       doc.text('Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Sheet, Angles, Flats & Channels', 42, currentY + 11);
       doc.text('Address: Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011', 42, currentY + 16);
-      doc.text('Mobile: +91 8986043632 | Email: sales@ujjwaliron.com', 42, currentY + 21);
+      doc.text('Mobile: +91 8986043632 | Email: ujjwalkrsigh356@gmail.com', 42, currentY + 21);
 
       currentY += 26;
       doc.setDrawColor(203, 213, 225); // slate-300
@@ -1900,7 +1900,7 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       <h2 className="text-2xl font-black tracking-tight text-slate-900">UJJWAL IRON</h2>
                       <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Sheet, Angles, Flats & Channels</p>
                       <p className="text-[10px] text-slate-600 mt-2">Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011</p>
-                      <p className="text-[10px] text-slate-600 mt-0.5">Mobile: +91 8986043632 | Email: sales@ujjwaliron.com</p>
+                      <p className="text-[10px] text-slate-600 mt-0.5">Mobile: +91 8986043632 | Email: ujjwalkrsigh356@gmail.com</p>
                     </div>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/images/logo.jpg" alt="Logo" className="h-14 w-14 rounded-full border border-slate-200 object-cover" />

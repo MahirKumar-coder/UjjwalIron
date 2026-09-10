@@ -10,7 +10,7 @@ export const metadata = {
 
 export default function ContactPage() {
   const phone = '+918986043632';
-  const email = 'sales@ujjwaliron.com';
+  const email = 'ujjwalkrsigh356@gmail.com';
   const gstin = '10AIAPR5590E1ZJ';
   const address = 'H/o Lalmati Devi, Ashiyana Digha Road, Digha Ghat, Patna, Bihar 800011';
   

@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
     "name": "Ujjwal Iron",
     "image": "https://ujjwaliron.com/images/hero_steel_yard.jpg",
     "telephone": "+918986043632",
-    "email": "sales@ujjwaliron.com",
+    "email": "ujjwalkrsigh356@gmail.com",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "H/o Lalmati Devi, Ashiyana Digha Road, Digha Ghat",

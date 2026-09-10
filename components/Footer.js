@@ -6,7 +6,7 @@ import { Phone, Mail, MapPin, CheckCircle2 } from 'lucide-react';
 
 export default function Footer() {
   const phone = '+918986043632';
-  const email = 'sales@ujjwaliron.com';
+  const email = 'ujjwalkrsigh356@gmail.com';
   const gstin = '10AIAPR5590E1ZJ';
   const address = 'H/o Lalmati Devi, Ashiyana Digha Road, Digha Ghat, Patna, Bihar 800011';
   const mapUrl = 'https://maps.google.com/?q=Ujjwal+Iron+Ashiyana+Digha+Road+Patna';
