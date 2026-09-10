@@ -47,7 +47,7 @@ export default function AdminPage() {
     gstNo: '',
     date: '',
     validityDays: 1,
-    items: [{ productId: '', name: '', size: '', brand: '', availableProductSizes: [], qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+    items: [{ productId: '', name: '', size: '', weight: '', brand: '', availableProductSizes: [], availableProductWeights: [], qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
     cgst: 0,
     sgst: 0,
     igst: 0,
@@ -203,6 +203,152 @@ export default function AdminPage() {
     }
   };
 
+  const getWeightsForCategoryAndSize = (category = '', size = '', prod = null) => {
+    if (!size) return [];
+    
+    // 1. If product has custom sizeVariants matching this size
+    if (prod && prod.sizeVariants && prod.sizeVariants.length > 0) {
+      const matchingVariants = prod.sizeVariants.filter(v => v.size && v.size.toLowerCase() === size.toLowerCase() && v.weight);
+      if (matchingVariants.length > 0) {
+        return matchingVariants.map(v => v.weight);
+      }
+    }
+
+    const clean = size.toLowerCase().replace(/[\s"'\-]/g, '');
+    const cat = (category || (prod?.category) || '').toLowerCase();
+
+    // 2. Rectangular Pipes (e.g. 50x25, 60x40, 75x40, 80x40, 100x50)
+    if (clean.includes('50x25') || clean.includes('50*25') || clean.includes('25x50')) {
+      return ['8.5 Kg (1.6mm / Light)', '10.8 Kg (2.0mm / Medium)', '13.5 Kg (2.5mm / Heavy)'];
+    }
+    if (clean.includes('60x40') || clean.includes('60*40')) {
+      return ['11.5 Kg (1.6mm / Light)', '15.2 Kg (2.0mm / Medium)', '19.0 Kg (2.6mm / Heavy)'];
+    }
+    if (clean.includes('75x40') || clean.includes('75*40')) {
+      if (cat.includes('pipe')) {
+        return ['13.5 Kg (1.6mm / Light)', '17.2 Kg (2.0mm / Medium)', '21.5 Kg (2.6mm / Heavy)'];
+      }
+      if (cat.includes('channel')) {
+        return ['5.8 Kg/Mtr (Light)', '6.8 Kg/Mtr (Standard)', '7.5 Kg/Mtr (Heavy)'];
+      }
+    }
+    if (clean.includes('80x40') || clean.includes('80*40')) {
+      return ['14.5 Kg (1.6mm / Light)', '18.5 Kg (2.0mm / Medium)', '23.0 Kg (2.6mm / Heavy)'];
+    }
+    if (clean.includes('100x50') || clean.includes('100*50')) {
+      if (cat.includes('pipe')) {
+        return ['18.5 Kg (1.8mm / Light)', '24.2 Kg (2.3mm / Medium)', '31.0 Kg (3.0mm / Heavy)'];
+      }
+      if (cat.includes('channel')) {
+        return ['8.0 Kg/Mtr (Light)', '9.2 Kg/Mtr (ISMC 100)', '10.5 Kg/Mtr (Heavy)'];
+      }
+    }
+
+    // 3. Square Pipes (e.g. 25x25, 40x40, 50x50, 100x100)
+    if (clean.includes('25x25') || clean.includes('25*25') || clean.includes('1x1')) {
+      return ['5.5 Kg (1.4mm / Light)', '7.2 Kg (1.8mm / Medium)', '9.0 Kg (2.3mm / Heavy)'];
+    }
+    if (clean.includes('40x40') || clean.includes('40*40') || clean.includes('1.5x1.5')) {
+      if (cat.includes('angle')) {
+        return ['2.4 Kg/Mtr (4.0mm)', '3.0 Kg/Mtr (5.0mm)', '3.5 Kg/Mtr (6.0mm)'];
+      }
+      return ['8.8 Kg (1.6mm / Light)', '11.5 Kg (2.0mm / Medium)', '14.2 Kg (2.6mm / Heavy)'];
+    }
+    if (clean.includes('50x50') || clean.includes('50*50') || clean.includes('2x2')) {
+      if (cat.includes('angle')) {
+        return ['3.0 Kg/Mtr (4.0mm)', '3.8 Kg/Mtr (5.0mm)', '4.5 Kg/Mtr (6.0mm)'];
+      }
+      return ['11.2 Kg (1.6mm / Light)', '14.8 Kg (2.0mm / Medium)', '18.5 Kg (2.6mm / Heavy)'];
+    }
+    if (clean.includes('100x100') || clean.includes('100*100')) {
+      return ['24.5 Kg (2.0mm / Light)', '32.0 Kg (2.6mm / Medium)', '41.5 Kg (3.5mm / Heavy)'];
+    }
+
+    // 4. Round Pipes
+    if (clean.includes('1/2') || clean.includes('15mm')) {
+      return ['4.2 Kg (Class A / Light)', '5.2 Kg (Class B / Medium)', '6.1 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('3/4') || clean.includes('20mm')) {
+      return ['6.0 Kg (Class A / Light)', '7.6 Kg (Class B / Medium)', '9.0 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('1') && !clean.includes('1.') && !clean.includes('1/')) {
+      return ['8.2 Kg (Class A / Light)', '10.2 Kg (Class B / Medium)', '12.5 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('1.25') || clean.includes('11/4') || clean.includes('32mm')) {
+      return ['11.0 Kg (Class A / Light)', '13.5 Kg (Class B / Medium)', '16.2 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('1.5') || clean.includes('11/2') || clean.includes('40mm')) {
+      return ['13.0 Kg (Class A / Light)', '16.2 Kg (Class B / Medium)', '19.5 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('2') && !clean.includes('2.') && !clean.includes('2/')) {
+      return ['17.5 Kg (Class A / Light)', '21.8 Kg (Class B / Medium)', '26.2 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('2.5') || clean.includes('21/2') || clean.includes('65mm')) {
+      return ['25.5 Kg (Class A / Light)', '31.5 Kg (Class B / Medium)', '37.5 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('3') && !clean.includes('3.') && !clean.includes('3/')) {
+      return ['34.0 Kg (Class A / Light)', '42.0 Kg (Class B / Medium)', '50.0 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('4') && !clean.includes('4.')) {
+      return ['48.0 Kg (Class A / Light)', '60.0 Kg (Class B / Medium)', '72.0 Kg (Class C / Heavy)'];
+    }
+    if (clean.includes('5') && !clean.includes('5.')) {
+      return ['70.0 Kg (Light)', '85.0 Kg (Medium)', '102.0 Kg (Heavy)'];
+    }
+    if (clean.includes('6') && !clean.includes('6.')) {
+      return ['95.0 Kg (Light)', '115.0 Kg (Medium)', '138.0 Kg (Heavy)'];
+    }
+
+    // 5. Sheets
+    if (cat.includes('sheet')) {
+      if (clean.includes('8x4') || clean.includes('8*4')) {
+        return ['7.8 Kg (0.35mm)', '9.2 Kg (0.40mm)', '11.2 Kg (0.50mm)', '13.5 Kg (0.60mm)'];
+      }
+      if (clean.includes('10x4') || clean.includes('10*4')) {
+        return ['9.8 Kg (0.35mm)', '11.5 Kg (0.40mm)', '14.0 Kg (0.50mm)', '16.8 Kg (0.60mm)'];
+      }
+      if (clean.includes('12x4') || clean.includes('12*4')) {
+        return ['11.8 Kg (0.35mm)', '13.8 Kg (0.40mm)', '16.8 Kg (0.50mm)', '20.2 Kg (0.60mm)'];
+      }
+      if (clean.includes('14x4') || clean.includes('14*4')) {
+        return ['14.0 Kg (0.35mm)', '16.2 Kg (0.40mm)', '19.6 Kg (0.50mm)', '23.5 Kg (0.60mm)'];
+      }
+      if (clean.includes('16x4') || clean.includes('16*4')) {
+        return ['16.0 Kg (0.35mm)', '18.5 Kg (0.40mm)', '22.5 Kg (0.50mm)', '27.0 Kg (0.60mm)'];
+      }
+      return ['0.35mm (~0.85 Kg/ft)', '0.40mm (~1.00 Kg/ft)', '0.50mm (~1.25 Kg/ft)', '0.60mm (~1.50 Kg/ft)'];
+    }
+
+    // 6. Angles
+    if (cat.includes('angle')) {
+      if (clean.includes('25x25') || clean.includes('25*25')) return ['0.9 Kg/Mtr (2.5mm)', '1.1 Kg/Mtr (3.0mm)', '1.4 Kg/Mtr (4.0mm)'];
+      if (clean.includes('32x32') || clean.includes('32*32')) return ['1.2 Kg/Mtr (2.5mm)', '1.4 Kg/Mtr (3.0mm)', '1.8 Kg/Mtr (4.0mm)'];
+      if (clean.includes('40x40') || clean.includes('40*40')) return ['2.4 Kg/Mtr (4.0mm)', '3.0 Kg/Mtr (5.0mm)', '3.5 Kg/Mtr (6.0mm)'];
+      if (clean.includes('50x50') || clean.includes('50*50')) return ['3.0 Kg/Mtr (4.0mm)', '3.8 Kg/Mtr (5.0mm)', '4.5 Kg/Mtr (6.0mm)'];
+      if (clean.includes('65x65') || clean.includes('65*65')) return ['4.9 Kg/Mtr (5.0mm)', '5.8 Kg/Mtr (6.0mm)', '7.7 Kg/Mtr (8.0mm)'];
+      if (clean.includes('75x75') || clean.includes('75*75')) return ['5.7 Kg/Mtr (5.0mm)', '6.8 Kg/Mtr (6.0mm)', '8.9 Kg/Mtr (8.0mm)'];
+      return ['Light Gauge', 'Standard / Medium', 'Heavy Gauge'];
+    }
+
+    // 7. Channels
+    if (cat.includes('channel')) {
+      if (clean.includes('75x40')) return ['5.8 Kg/Mtr (Light)', '6.8 Kg/Mtr (Standard)', '7.5 Kg/Mtr (Heavy)'];
+      if (clean.includes('100x50')) return ['8.0 Kg/Mtr (Light)', '9.2 Kg/Mtr (ISMC 100)', '10.5 Kg/Mtr (Heavy)'];
+      if (clean.includes('125x65')) return ['11.0 Kg/Mtr (Light)', '12.8 Kg/Mtr (ISMC 125)', '14.5 Kg/Mtr (Heavy)'];
+      if (clean.includes('150x75')) return ['14.5 Kg/Mtr (Light)', '16.4 Kg/Mtr (ISMC 150)', '18.5 Kg/Mtr (Heavy)'];
+      if (clean.includes('200x75')) return ['19.5 Kg/Mtr (Light)', '22.3 Kg/Mtr (ISMC 200)', '25.0 Kg/Mtr (Heavy)'];
+    }
+
+    // 8. Chaukhat
+    if (cat.includes('chaukhat')) {
+      if (clean.includes('7x3') || clean.includes('7*3')) return ['16.0 Kg (Light)', '18.5 Kg (Standard)', '21.0 Kg (Heavy)'];
+      if (clean.includes('7x3.5') || clean.includes('7*3.5')) return ['18.0 Kg (Light)', '20.0 Kg (Standard)', '23.0 Kg (Heavy)'];
+      if (clean.includes('7x4') || clean.includes('7*4')) return ['21.0 Kg (Light)', '24.5 Kg (Standard)', '28.0 Kg (Heavy)'];
+    }
+
+    return ['Light', 'Standard / Medium', 'Heavy'];
+  };
+
   const generateQuotationNo = () => {
     const today = new Date();
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
@@ -222,7 +368,7 @@ export default function AdminPage() {
       gstNo: '',
       date: new Date().toISOString().slice(0, 10),
       validityDays: 1,
-      items: [{ productId: '', name: '', size: '', brand: '', availableProductSizes: [], qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+      items: [{ productId: '', name: '', size: '', weight: '', brand: '', availableProductSizes: [], availableProductWeights: [], qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
       cgst: 0,
       sgst: 0,
       igst: 0,
@@ -253,17 +399,20 @@ export default function AdminPage() {
         let productSizes = [];
         if (linkedProd) {
           if (linkedProd.sizeVariants && linkedProd.sizeVariants.length > 0) {
-            productSizes = linkedProd.sizeVariants.map(v => v.size + (v.weight ? ` [${v.weight}]` : ''));
+            productSizes = linkedProd.sizeVariants.map(v => v.size);
           } else if (linkedProd.availableSizes && linkedProd.availableSizes.length > 0) {
             productSizes = [...linkedProd.availableSizes];
           }
         }
+        const weights = getWeightsForCategoryAndSize(linkedProd?.category || '', item.size || '', linkedProd);
         return {
           productId: item.productId || linkedProd?._id || '',
           name: item.name,
           size: item.size || '',
+          weight: item.weight || (weights.length > 0 ? weights[0] : ''),
           brand: item.brand || linkedProd?.brand || '',
           availableProductSizes: productSizes,
+          availableProductWeights: weights,
           qty: item.qty,
           unit: item.unit || 'Pcs',
           rate: item.rate,
@@ -351,8 +500,10 @@ export default function AdminPage() {
           productId: '',
           name: '',
           size: '',
+          weight: '',
           brand: '',
           availableProductSizes: [],
+          availableProductWeights: [],
           qty: 1,
           unit: 'Pcs',
           rate: 0,
@@ -387,8 +538,10 @@ export default function AdminPage() {
     if (!prod) {
       updatedItems[index].productId = '';
       updatedItems[index].size = '';
+      updatedItems[index].weight = '';
       updatedItems[index].brand = '';
       updatedItems[index].availableProductSizes = [];
+      updatedItems[index].availableProductWeights = [];
       setQuotationFormData(prev => ({ ...prev, items: updatedItems }));
       return;
     }
@@ -396,23 +549,28 @@ export default function AdminPage() {
     // Extract available sizes from product
     let productSizes = [];
     if (prod.sizeVariants && prod.sizeVariants.length > 0) {
-      productSizes = prod.sizeVariants.map(v => v.size + (v.weight ? ` [${v.weight}]` : ''));
+      productSizes = prod.sizeVariants.map(v => v.size);
     } else if (prod.availableSizes && prod.availableSizes.length > 0) {
       productSizes = [...prod.availableSizes];
     } else {
-      productSizes = getCategorySizeWeightPresets(prod.category).map(p => p.size + (p.weight ? ` [${p.weight}]` : ''));
+      productSizes = getCategorySizeWeightPresets(prod.category).map(p => p.size);
     }
 
-    const firstRawSize = prod.sizeVariants?.[0]?.size || prod.availableSizes?.[0] || '';
+    const firstRawSize = productSizes.length > 0 ? productSizes[0] : '';
+    const weights = getWeightsForCategoryAndSize(prod.category, firstRawSize, prod);
+    const firstWeight = weights.length > 0 ? weights[0] : '';
     
     updatedItems[index].productId = prod._id;
     updatedItems[index].brand = prod.brand || '';
     updatedItems[index].size = firstRawSize;
+    updatedItems[index].weight = firstWeight;
     updatedItems[index].availableProductSizes = productSizes;
+    updatedItems[index].availableProductWeights = weights;
     
     const sizeDisplay = firstRawSize ? ` - ${firstRawSize}` : '';
+    const weightDisplay = firstWeight ? ` (${firstWeight})` : '';
     const brandDisplay = prod.brand ? ` (${prod.brand})` : '';
-    updatedItems[index].name = `${prod.name}${sizeDisplay}${brandDisplay}`;
+    updatedItems[index].name = `${prod.name}${sizeDisplay}${weightDisplay}${brandDisplay}`;
 
     let estRate = 0;
     if (prod.price && prod.price !== 'On Request') {
@@ -432,17 +590,40 @@ export default function AdminPage() {
 
   const handleSizeSelect = (index, selectedSize) => {
     const updatedItems = [...quotationFormData.items];
-    
-    // Clean size name if it has [weight] attached
     const cleanSize = selectedSize.replace(/\s*\[.*?\]\s*/g, '').trim();
     updatedItems[index].size = cleanSize;
 
-    // If item was chosen from a product, update the item name nicely
     const prod = products.find(p => p._id === updatedItems[index].productId);
+    const weights = getWeightsForCategoryAndSize(prod?.category || '', cleanSize, prod);
+    updatedItems[index].availableProductWeights = weights;
+    
+    const firstWeight = weights.length > 0 ? weights[0] : '';
+    updatedItems[index].weight = firstWeight;
+
     if (prod) {
       const sizeDisplay = cleanSize ? ` - ${cleanSize}` : '';
+      const weightDisplay = firstWeight ? ` (${firstWeight})` : '';
       const brandDisplay = prod.brand ? ` (${prod.brand})` : '';
-      updatedItems[index].name = `${prod.name}${sizeDisplay}${brandDisplay}`;
+      updatedItems[index].name = `${prod.name}${sizeDisplay}${weightDisplay}${brandDisplay}`;
+    }
+
+    setQuotationFormData(prev => ({
+      ...prev,
+      items: updatedItems
+    }));
+  };
+
+  const handleWeightSelect = (index, selectedWeight) => {
+    const updatedItems = [...quotationFormData.items];
+    const cleanWeight = selectedWeight === 'custom' ? '' : selectedWeight;
+    updatedItems[index].weight = cleanWeight;
+
+    const prod = products.find(p => p._id === updatedItems[index].productId);
+    if (prod) {
+      const sizeDisplay = updatedItems[index].size ? ` - ${updatedItems[index].size}` : '';
+      const weightDisplay = cleanWeight ? ` (${cleanWeight})` : '';
+      const brandDisplay = prod.brand ? ` (${prod.brand})` : '';
+      updatedItems[index].name = `${prod.name}${sizeDisplay}${weightDisplay}${brandDisplay}`;
     }
 
     setQuotationFormData(prev => ({
@@ -914,21 +1095,30 @@ export default function AdminPage() {
     switch (cat) {
       case 'MS Pipes':
       case 'Tata Pipe':
-      case 'HR Sheets':
+      case 'HR Pipe':
       case 'CR Pipe':
         return [
-          { size: '1/2" (15mm)', weight: '5.2 Kg (6m Length)' },
-          { size: '3/4" (20mm)', weight: '7.6 Kg (6m Length)' },
-          { size: '1" (25mm)', weight: '10.2 Kg (6m Length)' },
-          { size: '1.25" (32mm)', weight: '13.5 Kg (6m Length)' },
-          { size: '1.5" (40mm)', weight: '16.2 Kg (6m Length)' },
-          { size: '2" (50mm)', weight: '21.8 Kg (6m Length)' },
-          { size: '2.5" (65mm)', weight: '31.5 Kg (6m Length)' },
-          { size: '3" (80mm)', weight: '42.0 Kg (6m Length)' },
-          { size: '4" (100mm)', weight: '60.0 Kg (6m Length)' },
-          { size: '5" (125mm)', weight: '85.0 Kg (6m Length)' },
-          { size: '6" (150mm)', weight: '115.0 Kg (6m Length)' },
-          { size: '8" (200mm)', weight: '175.0 Kg (6m Length)' },
+          { size: '50x25mm (Rect)', weight: '10.8 Kg (2.0mm Medium)' },
+          { size: '40x40mm (Square)', weight: '11.5 Kg (2.0mm Medium)' },
+          { size: '50x50mm (Square)', weight: '14.8 Kg (2.0mm Medium)' },
+          { size: '25x25mm (Square)', weight: '7.2 Kg (1.8mm Medium)' },
+          { size: '60x40mm (Rect)', weight: '15.2 Kg (2.0mm Medium)' },
+          { size: '75x40mm (Rect)', weight: '17.2 Kg (2.0mm Medium)' },
+          { size: '80x40mm (Rect)', weight: '18.5 Kg (2.0mm Medium)' },
+          { size: '100x50mm (Rect)', weight: '24.2 Kg (2.3mm Medium)' },
+          { size: '100x100mm (Square)', weight: '32.0 Kg (2.6mm Medium)' },
+          { size: '1/2" (15mm Round)', weight: '5.2 Kg (6m Length)' },
+          { size: '3/4" (20mm Round)', weight: '7.6 Kg (6m Length)' },
+          { size: '1" (25mm Round)', weight: '10.2 Kg (6m Length)' },
+          { size: '1.25" (32mm Round)', weight: '13.5 Kg (6m Length)' },
+          { size: '1.5" (40mm Round)', weight: '16.2 Kg (6m Length)' },
+          { size: '2" (50mm Round)', weight: '21.8 Kg (6m Length)' },
+          { size: '2.5" (65mm Round)', weight: '31.5 Kg (6m Length)' },
+          { size: '3" (80mm Round)', weight: '42.0 Kg (6m Length)' },
+          { size: '4" (100mm Round)', weight: '60.0 Kg (6m Length)' },
+          { size: '5" (125mm Round)', weight: '85.0 Kg (6m Length)' },
+          { size: '6" (150mm Round)', weight: '115.0 Kg (6m Length)' },
+          { size: '8" (200mm Round)', weight: '175.0 Kg (6m Length)' },
         ];
       case 'MS Angle':
         return [
@@ -2165,24 +2355,24 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                       {quotationFormData.items.map((item, index) => (
                         <div 
                           key={index} 
-                          className="flex flex-col gap-3 bg-slate-50/70 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
+                          className="flex flex-col gap-3 bg-slate-50/90 dark:bg-slate-900/90 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
                         >
-                          {/* Row 1: Product Selector, Size Selector & Material Description */}
+                          {/* Row 1: Product Selector, Size Selector, Weight Selector & Material Description */}
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                             {/* 1. Catalog Product Dropdown */}
-                            <div className="md:col-span-4">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                                1. Select Product from Catalog
+                            <div className="md:col-span-3">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                                1. Catalog Product
                               </label>
                               <select
                                 value={item.productId || ''}
                                 onChange={(e) => handleProductSelect(index, e.target.value)}
-                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 font-semibold focus:border-amber-500 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-semibold px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
                               >
-                                <option value="">-- Pick from Catalog (or Custom) --</option>
+                                <option value="" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">-- Pick Product (or Custom) --</option>
                                 {products.filter(p => p.isActive).map(p => (
-                                  <option key={p._id} value={p._id}>
-                                    {p.name} ({p.brand}) {p.sizeVariants?.length ? `• ${p.sizeVariants.length} Sizes` : ''}
+                                  <option key={p._id} value={p._id} className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+                                    {p.name} ({p.brand})
                                   </option>
                                 ))}
                               </select>
@@ -2191,20 +2381,20 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                             {/* 2. Size Selector Dropdown / Custom Input */}
                             <div className="md:col-span-3">
                               <label className="block text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-1 flex items-center justify-between">
-                                <span>2. Select Size (साइज़)</span>
+                                <span>2. Choose Size (साइज़)</span>
                                 {item.availableProductSizes?.length > 0 && (
-                                  <span className="text-3xs font-mono font-normal text-slate-400">({item.availableProductSizes.length} sizes)</span>
+                                  <span className="text-3xs font-mono font-normal text-slate-400">({item.availableProductSizes.length})</span>
                                 )}
                               </label>
                               {item.availableProductSizes && item.availableProductSizes.length > 0 ? (
                                 <select
                                   value={item.size || ''}
                                   onChange={(e) => handleSizeSelect(index, e.target.value)}
-                                  className="w-full rounded-xl border border-amber-500/40 bg-amber-50/50 dark:bg-amber-950/20 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 font-bold focus:border-amber-500 focus:outline-none"
+                                  className="w-full rounded-xl border border-amber-500/60 dark:border-amber-500/50 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-bold px-3 py-2 text-xs focus:border-amber-500 focus:outline-none shadow-xs"
                                 >
-                                  <option value="">-- Choose Size --</option>
+                                  <option value="" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">-- Select Size --</option>
                                   {item.availableProductSizes.map((sz, sIdx) => (
-                                    <option key={sIdx} value={sz}>{sz}</option>
+                                    <option key={sIdx} value={sz} className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">{sz}</option>
                                   ))}
                                 </select>
                               ) : (
@@ -2212,50 +2402,81 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                   type="text"
                                   value={item.size || ''}
                                   onChange={(e) => handleSizeSelect(index, e.target.value)}
-                                  placeholder='e.g. 1" (25mm) or 40x40x6mm'
-                                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                                  placeholder='e.g. 50x25mm or 1"'
+                                  className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
                                 />
                               )}
                             </div>
 
-                            {/* 3. Final Material Description on Quotation */}
-                            <div className="md:col-span-5">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                                Material Description on Quotation *
+                            {/* 3. Weight / Gauge Selector Dropdown / Custom Input */}
+                            <div className="md:col-span-3">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 mb-1 flex items-center justify-between">
+                                <span>3. Weight / Gauge (वजन)</span>
+                                {item.availableProductWeights?.length > 0 && (
+                                  <span className="text-3xs font-mono font-normal text-slate-400">({item.availableProductWeights.length} tiers)</span>
+                                )}
+                              </label>
+                              {item.availableProductWeights && item.availableProductWeights.length > 0 ? (
+                                <select
+                                  value={item.weight || ''}
+                                  onChange={(e) => handleWeightSelect(index, e.target.value)}
+                                  className="w-full rounded-xl border border-emerald-500/60 dark:border-emerald-500/50 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-bold px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none shadow-xs"
+                                >
+                                  <option value="" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">-- Select Weight --</option>
+                                  {item.availableProductWeights.map((w, wIdx) => (
+                                    <option key={wIdx} value={w} className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">{w}</option>
+                                  ))}
+                                  <option value="custom" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">+ Type Custom Weight...</option>
+                                </select>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={item.weight || ''}
+                                  onChange={(e) => handleWeightSelect(index, e.target.value)}
+                                  placeholder="e.g. 10.8 Kg (2.0mm)"
+                                  className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                                />
+                              )}
+                            </div>
+
+                            {/* 4. Final Material Description on Quotation */}
+                            <div className="md:col-span-3">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                                Quotation Item Description *
                               </label>
                               <input
                                 type="text"
                                 required
                                 value={item.name}
                                 onChange={(e) => handleQuotationItemChange(index, 'name', e.target.value)}
-                                placeholder="e.g. MS Round Pipe - 1 Inch (Tata)"
-                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 font-medium focus:border-amber-500 focus:outline-none"
+                                placeholder="e.g. MS Pipe 50x25 - 10.8 Kg"
+                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-medium px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
                               />
                             </div>
                           </div>
 
                           {/* Row 2: Unit, Qty, Rate, Total, Delete */}
-                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center pt-2 border-t border-slate-200 dark:border-slate-800">
                             <div className="sm:col-span-3">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Unit</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Unit</label>
                               <select
                                 value={item.unit}
                                 onChange={(e) => handleQuotationItemChange(index, 'unit', e.target.value)}
-                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none font-semibold"
                               >
-                                <option value="Pcs">Pcs (नग)</option>
-                                <option value="Tons">Tons (टन)</option>
-                                <option value="Kgs">Kgs (किलो)</option>
-                                <option value="Meters">Mtr (मीटर)</option>
-                                <option value="Feet">Feet (फीट)</option>
-                                <option value="Bundles">Bundle (बंडल)</option>
-                                <option value="Sheets">Sheet (शीट)</option>
-                                <option value="Frames">Frame (चौखट)</option>
+                                <option value="Pcs" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Pcs (नग)</option>
+                                <option value="Tons" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Tons (टन)</option>
+                                <option value="Kgs" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Kgs (किलो)</option>
+                                <option value="Meters" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Mtr (मीटर)</option>
+                                <option value="Feet" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Feet (फीट)</option>
+                                <option value="Bundles" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Bundle (बंडल)</option>
+                                <option value="Sheets" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Sheet (शीट)</option>
+                                <option value="Frames" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Frame (चौखट)</option>
                               </select>
                             </div>
 
                             <div className="sm:col-span-2">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Qty *</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 text-right">Qty *</label>
                               <input
                                 type="number"
                                 required
@@ -2263,12 +2484,12 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 step="any"
                                 value={item.qty}
                                 onChange={(e) => handleQuotationItemChange(index, 'qty', e.target.value)}
-                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono font-bold"
+                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none text-right font-mono font-bold"
                               />
                             </div>
 
                             <div className="sm:col-span-3">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Rate / Unit (₹) *</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 text-right">Rate / Unit (₹) *</label>
                               <input
                                 type="number"
                                 required
@@ -2276,12 +2497,12 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 step="any"
                                 value={item.rate}
                                 onChange={(e) => handleQuotationItemChange(index, 'rate', e.target.value)}
-                                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none text-right font-mono font-bold"
+                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none text-right font-mono font-bold"
                               />
                             </div>
 
                             <div className="sm:col-span-3">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 text-right">Line Total (₹)</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 text-right">Line Total (₹)</label>
                               <div className="w-full text-right font-mono text-sm px-3 py-1.5 font-black text-amber-600 dark:text-amber-400 truncate">
                                 ₹{(Number(item.qty || 0) * Number(item.rate || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </div>

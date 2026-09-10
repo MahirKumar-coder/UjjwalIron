@@ -44,6 +44,7 @@ const QuotationSchema = new mongoose.Schema(
         productId: { type: String },
         name: { type: String, required: true },
         size: { type: String, default: '' },
+        weight: { type: String, default: '' },
         brand: { type: String },
         specification: { type: String },
         qty: { type: Number, required: true },
