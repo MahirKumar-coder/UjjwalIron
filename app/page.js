@@ -43,11 +43,11 @@ export default function Home() {
       href: '/products?category=Tata+Sheet'
     },
     {
-      title: 'HR Sheets & CR Pipe',
+      title: 'HR Sheets',
       desc: 'Hot Rolled and Cold Rolled precision pipes for automotive, furniture, and engineering fabrication.',
       brands: 'Jindal, Tata, High-Grade Mills',
       icon: <Box className="h-5 w-5 text-amber-500" />,
-      imageUrl: '/images/cat_ms_pipes.jpg',
+      imageUrl: '/images/HR-Sheets-2.webp',
       href: '/products?category=HR+Pipe'
     },
     {
