@@ -96,7 +96,7 @@ export default function Footer() {
         {/* Copyright & Disclaimer */}
         <div className="mt-12 border-t border-stone-200 dark:border-stone-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
           <p>&copy; {new Date().getFullYear()} Ujjwal Iron. All rights reserved.</p>
-          <p className="text-slate-500 dark:text-slate-400">Authorized Dealer: Tata Structura | Jindal Star | SAIL</p>
+          <p className="text-slate-500 dark:text-slate-400">Authorized Dealer: Tata Structura | Jindal | SAIL</p>
         </div>
       </div>
     </footer>

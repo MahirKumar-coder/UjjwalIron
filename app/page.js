@@ -29,7 +29,7 @@ export default function Home() {
     {
       title: 'MS Pipes & Hollow Sections',
       desc: 'Round, Rectangle, and Square mild steel pipes and hollow structural sections.',
-      brands: 'Tata Structura, Jindal Star, APL Apollo',
+      brands: 'Tata Structura, Jindal, APL Apollo',
       icon: <Layers className="h-5 w-5 text-amber-500" />,
       imageUrl: '/images/cat_ms_pipes.jpg',
       href: '/products?category=MS+Pipes'
@@ -141,7 +141,7 @@ export default function Home() {
 
               {/* Description */}
               <p className="mt-6 max-w-lg text-lg text-slate-600 dark:text-slate-400 sm:text-xl">
-                Authorized dealers of Tata Structura, Jindal Star, and SAIL. We supply high-grade MS Pipes, Tata/Jindal Sheets, HR/CR Sheet, Angles, Flats & Channels with fast, direct-to-site delivery.
+                Authorized dealers of Tata Structura, Jindal, and SAIL. We supply high-grade MS Pipes, Tata/Jindal Sheets, HR/CR Sheet, Angles, Flats & Channels with fast, direct-to-site delivery.
               </p>
 
               {/* Call to Actions */}
