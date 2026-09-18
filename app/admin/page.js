@@ -822,54 +822,76 @@ export default function AdminPage() {
 
       currentY += 5;
 
-      if (currentY > 220) {
+      if (currentY > 210) {
         doc.addPage();
         currentY = 20;
       }
 
+      // Bank Details Box on the Left
+      doc.setFillColor(248, 250, 252); // slate-50
+      doc.setDrawColor(226, 232, 240); // slate-200
+      doc.roundedRect(leftMargin, currentY, 95, 27, 2, 2, 'FD');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42); // slate-900
+      doc.text('Bank Account Details (NEFT / RTGS / IMPS):', leftMargin + 3, currentY + 5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.8);
+      doc.setTextColor(51, 65, 85); // slate-700
+      doc.text('Bank Name: ICICI Bank', leftMargin + 3, currentY + 9.5);
+      doc.text('Account Name: UJJWAL IRON', leftMargin + 3, currentY + 13.5);
+      doc.text('Account No: 238105500009', leftMargin + 3, currentY + 17.5);
+      doc.text('IFSC Code: ICIC0002381', leftMargin + 3, currentY + 21.5);
+      doc.text('Branch: Patliputra', leftMargin + 3, currentY + 25.5);
+
+      // Cost Calculation Summary on the Right
       const summaryStartX = 120;
+      let costY = currentY + 2;
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(71, 85, 105);
 
       // Subtotal
-      doc.text('Subtotal:', summaryStartX, currentY);
-      doc.text(`Rs. ${quote.subtotal.toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
-      currentY += 5;
+      doc.text('Subtotal:', summaryStartX, costY);
+      doc.text(`Rs. ${quote.subtotal.toFixed(2)}`, rightMargin - 1, costY, { align: 'right' });
+      costY += 5;
 
       // Loading / Transportation
       if (quote.loadingCharges > 0) {
-        doc.text('Loading Charges:', summaryStartX, currentY);
-        doc.text(`Rs. ${quote.loadingCharges.toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
-        currentY += 5;
+        doc.text('Loading Charges:', summaryStartX, costY);
+        doc.text(`Rs. ${quote.loadingCharges.toFixed(2)}`, rightMargin - 1, costY, { align: 'right' });
+        costY += 5;
       }
       if (quote.transportCharges > 0) {
-        doc.text('Transportation:', summaryStartX, currentY);
-        doc.text(`Rs. ${quote.transportCharges.toFixed(2)}`, rightMargin - 1, currentY, { align: 'right' });
-        currentY += 5;
+        doc.text('Transportation:', summaryStartX, costY);
+        doc.text(`Rs. ${quote.transportCharges.toFixed(2)}`, rightMargin - 1, costY, { align: 'right' });
+        costY += 5;
       }
 
       doc.setDrawColor(203, 213, 225);
-      doc.line(summaryStartX, currentY, rightMargin - 1, currentY);
-      currentY += 4;
+      doc.line(summaryStartX, costY, rightMargin - 1, costY);
+      costY += 4;
 
       // Grand Total
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.setTextColor(15, 23, 42); // slate-900
-      doc.text('Grand Total:', summaryStartX, currentY);
-      doc.text(`Rs. ${Math.round(quote.totalAmount).toLocaleString('en-IN')}`, rightMargin - 1, currentY, { align: 'right' });
+      doc.text('Grand Total:', summaryStartX, costY);
+      doc.text(`Rs. ${Math.round(quote.totalAmount).toLocaleString('en-IN')}`, rightMargin - 1, costY, { align: 'right' });
 
-      currentY += 15;
+      currentY = Math.max(currentY + 31, costY + 8);
 
       if (currentY > 240) {
         doc.addPage();
         currentY = 20;
       }
 
-      // Terms
+      // Terms & Conditions
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9.5);
+      doc.setFontSize(9);
+      doc.setTextColor(15, 23, 42);
       doc.text('Terms & Conditions:', leftMargin, currentY);
       
       doc.setFont('helvetica', 'normal');
@@ -883,16 +905,11 @@ export default function AdminPage() {
         termsY += 4;
       });
 
-      // Signature box
+      // Company Header on Right (Authorized Signatory removed as requested)
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(9);
       doc.setTextColor(15, 23, 42);
       doc.text('For UJJWAL IRON', 150, currentY);
-      
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(100, 116, 139);
-      doc.text('Authorized Signatory', 150, currentY + 18);
 
       const filename = `${quote.quotationNo}_${quote.customerName.replace(/\s+/g, '_')}.pdf`;
       doc.save(filename);
@@ -2218,19 +2235,36 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     </table>
                   </div>
 
-                  {/* Calculations summary and Signatory section */}
+                  {/* Calculations summary, Bank Details and Signatory section */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mt-6 pt-4 border-t border-slate-200 text-[10px] text-slate-600">
-                    {/* Terms */}
-                    <div>
-                      <span className="font-extrabold text-slate-900 block uppercase mb-1">Terms & Conditions:</span>
-                      <ul className="list-none space-y-1 pl-0">
-                        {quotationFormData.terms.split('\n').map((term, tIdx) => (
-                          <li key={tIdx} className="leading-snug">{term}</li>
-                        ))}
-                      </ul>
+                    {/* Left Column: Bank Details & Terms */}
+                    <div className="space-y-4">
+                      {/* Bank Details */}
+                      <div className="rounded-xl bg-slate-50 p-3 border border-slate-200 text-slate-700">
+                        <span className="font-extrabold text-slate-900 block uppercase mb-1.5 text-[11px]">
+                          Bank Account Details (NEFT / RTGS / IMPS):
+                        </span>
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px]">
+                          <div><span className="text-slate-500">Bank Name:</span> <strong className="text-slate-900">ICICI Bank</strong></div>
+                          <div><span className="text-slate-500">Account Name:</span> <strong className="text-slate-900">UJJWAL IRON</strong></div>
+                          <div><span className="text-slate-500">Account No:</span> <strong className="text-slate-900 font-mono">238105500009</strong></div>
+                          <div><span className="text-slate-500">IFSC Code:</span> <strong className="text-slate-900 font-mono">ICIC0002381</strong></div>
+                          <div className="col-span-2"><span className="text-slate-500">Branch:</span> <strong className="text-slate-900">Patliputra</strong></div>
+                        </div>
+                      </div>
+
+                      {/* Terms */}
+                      <div>
+                        <span className="font-extrabold text-slate-900 block uppercase mb-1">Terms & Conditions:</span>
+                        <ul className="list-none space-y-1 pl-0">
+                          {quotationFormData.terms.split('\n').map((term, tIdx) => (
+                            <li key={tIdx} className="leading-snug">{term}</li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
 
-                    {/* Cost Calculations Summary */}
+                    {/* Right Column: Cost Calculations Summary & Signatory Header */}
                     <div className="flex flex-col items-end gap-2 text-right">
                       <div className="w-full max-w-xs space-y-1">
                         <div className="flex justify-between">
@@ -2255,10 +2289,9 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                         </div>
                       </div>
 
-                      {/* Signatory */}
+                      {/* Company Header without Authorized Signatory text */}
                       <div className="mt-8 pt-8 text-right w-full">
                         <p className="font-extrabold text-slate-900">For UJJWAL IRON</p>
-                        <p className="text-[8px] text-slate-400 mt-8">Authorized Signatory</p>
                       </div>
                     </div>
                   </div>
