@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Tag, Shield, Maximize2, Scale, X, MessageCircle, Check, Sparkles } from 'lucide-react';
+import { Tag, Shield, Maximize2, Scale, X, MessageCircle, Check, Sparkles, ShoppingBag } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 
 export default function ProductCard({ product, whatsappNumber = '918986043632' }) {
   const {
@@ -17,6 +18,8 @@ export default function ProductCard({ product, whatsappNumber = '918986043632' }
     imageUrl,
     specifications,
   } = product;
+
+  const { addToCart, setIsCartOpen } = useCart();
 
   // Normalize variants list
   const variants = React.useMemo(() => {
@@ -211,24 +214,37 @@ export default function ProductCard({ product, whatsappNumber = '918986043632' }
               <span className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400 font-mono">{price}</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(true)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm transition-all active:scale-95"
-              >
-                <Scale size={13} />
-                <span>Sizes & Weight</span>
-              </button>
+            <div className="space-y-1.5 pt-1">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  className="flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 px-2.5 py-2.5 text-xs font-bold text-white shadow-sm transition-all active:scale-95 cursor-pointer"
+                >
+                  <Scale size={13} />
+                  <span className="truncate">Sizes & Weight</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    addToCart(product, currentVariant, 10);
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-amber-400 dark:text-amber-300 border border-amber-500/30 px-2.5 py-2.5 text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
+                >
+                  <ShoppingBag size={13} />
+                  <span className="truncate">+ Add to Cart</span>
+                </button>
+              </div>
 
               <a
                 href={getWhatsAppInquiryLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm transition-all active:scale-95"
+                className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-600/25 hover:border-emerald-600 py-2 text-2xs font-bold text-emerald-700 dark:text-emerald-400 hover:text-white transition-all active:scale-95"
               >
-                <MessageCircle size={13} />
-                <span>WhatsApp</span>
+                <MessageCircle size={12} />
+                <span>Direct WhatsApp Quote</span>
               </a>
             </div>
           </div>
@@ -398,18 +414,32 @@ export default function ProductCard({ product, whatsappNumber = '918986043632' }
             </div>
 
             {/* Modal Sticky Footer CTA */}
-            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 shrink-0">
-              <a
-                href={getWhatsAppInquiryLink()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 py-3 px-4 text-sm font-black text-white shadow-lg shadow-emerald-600/25 transition-all active:scale-98"
-              >
-                <MessageCircle size={18} />
-                <span>
-                  Get WhatsApp Price for {currentVariant?.size || 'Product'} {calculated ? `(~${calculated.totalKg} Kg)` : ''}
-                </span>
-              </a>
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 shrink-0 space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    addToCart(product, currentVariant, quantity);
+                    setIsModalOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-amber-600 hover:bg-amber-500 py-3 px-4 text-xs sm:text-sm font-black text-white shadow-md shadow-amber-600/25 transition-all active:scale-98 cursor-pointer"
+                >
+                  <ShoppingBag size={16} />
+                  <span>
+                    Add to Cart ({quantity} Pcs{calculated ? ` • ~${calculated.totalKg} Kg` : ''})
+                  </span>
+                </button>
+
+                <a
+                  href={getWhatsAppInquiryLink()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 py-3 px-4 text-xs sm:text-sm font-black text-white shadow-md shadow-emerald-600/25 transition-all active:scale-98"
+                >
+                  <MessageCircle size={16} />
+                  <span>Direct WhatsApp</span>
+                </a>
+              </div>
             </div>
 
           </div>

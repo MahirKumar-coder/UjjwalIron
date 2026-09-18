@@ -1,6 +1,9 @@
 import { Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import CartDrawer from '@/components/CartDrawer';
+import FloatingCartButton from '@/components/FloatingCartButton';
+import { CartProvider } from '@/context/CartContext';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -61,9 +64,13 @@ export default function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+        <CartProvider>
+          <Navbar />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+          <CartDrawer />
+          <FloatingCartButton />
+        </CartProvider>
       </body>
     </html>
   );

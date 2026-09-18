@@ -3,13 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Phone, Menu, X, Sun, Moon } from 'lucide-react';
+import { Phone, Menu, X, Sun, Moon, ShoppingBag } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 
 export default function Navbar({ phone = '+918986043632' }) {
   const [isOpen, setIsOpen] = useState(false);
   const [theme, setTheme] = useState('dark');
   const pathname = usePathname();
   const router = useRouter();
+  const { itemTypesCount, totalItemsCount, setIsCartOpen } = useCart();
 
   // Handle double-click logo to navigate to Admin
   let clickTimeout = null;
@@ -60,7 +62,7 @@ export default function Navbar({ phone = '+918986043632' }) {
   const isActive = (path) => pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors duration-300">
+    <nav className="sticky top-0 z-40 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           
@@ -99,8 +101,23 @@ export default function Navbar({ phone = '+918986043632' }) {
             </div>
           </div>
 
-          {/* Desktop Call & Theme Actions */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Desktop Call, Cart & Theme Actions */}
+          <div className="hidden md:flex items-center gap-3.5">
+            {/* Cart Button */}
+            <button
+              type="button"
+              onClick={() => setIsCartOpen(true)}
+              className="relative rounded-xl border border-slate-200 dark:border-slate-800 p-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200"
+              aria-label="View Cart"
+            >
+              <ShoppingBag size={18} className="text-amber-600 dark:text-amber-400" />
+              {itemTypesCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-emerald-600 px-1 text-[10px] font-black text-white shadow-xs">
+                  {itemTypesCount}
+                </span>
+              )}
+            </button>
+
             <button
               onClick={toggleTheme}
               className="rounded-xl border border-slate-200 dark:border-slate-800 p-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200"
@@ -122,8 +139,23 @@ export default function Navbar({ phone = '+918986043632' }) {
             </a>
           </div>
 
-          {/* Mobile Menu & Theme Actions */}
+          {/* Mobile Menu, Cart & Theme Actions */}
           <div className="flex items-center gap-2 md:hidden">
+            {/* Mobile Cart Button */}
+            <button
+              type="button"
+              onClick={() => setIsCartOpen(true)}
+              className="relative rounded-xl border border-slate-200 dark:border-slate-800 p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+              aria-label="View Cart"
+            >
+              <ShoppingBag size={18} className="text-amber-600 dark:text-amber-400" />
+              {itemTypesCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-emerald-600 px-1 text-[9px] font-black text-white">
+                  {itemTypesCount}
+                </span>
+              )}
+            </button>
+
             <button
               onClick={toggleTheme}
               className="rounded-xl border border-slate-200 dark:border-slate-800 p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
