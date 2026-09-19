@@ -1,5 +1,5 @@
 export default async function sitemap() {
-  const baseUrl = 'https://ujjwaliron.com'; // Replace this with your actual custom domain once purchased
+  const baseUrl = 'https://ujjwal-iron.vercel.app/'; // Replace this with your actual custom domain once purchased
 
   const paths = [
     {
