@@ -47,12 +47,12 @@ export default function AdminPage() {
     gstNo: '',
     date: '',
     validityDays: 1,
-    items: [{ productId: '', name: '', size: '', weight: '', brand: '', availableProductSizes: [], availableProductWeights: [], qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+    items: [{ productId: '', name: '', size: '', weight: '', brand: '', availableProductSizes: [], availableProductWeights: [], qty: 1, unit: 'Pcs', rate: '', total: 0 }],
     cgst: 0,
     sgst: 0,
     igst: 0,
-    loadingCharges: 0,
-    transportCharges: 0,
+    loadingCharges: '',
+    transportCharges: '',
     subtotal: 0,
     totalTax: 0,
     totalAmount: 0,
@@ -368,12 +368,12 @@ export default function AdminPage() {
       gstNo: '',
       date: new Date().toISOString().slice(0, 10),
       validityDays: 1,
-      items: [{ productId: '', name: '', size: '', weight: '', brand: '', availableProductSizes: [], availableProductWeights: [], qty: 1, unit: 'Pcs', rate: 0, total: 0 }],
+      items: [{ productId: '', name: '', size: '', weight: '', brand: '', availableProductSizes: [], availableProductWeights: [], qty: 1, unit: 'Pcs', rate: '', total: 0 }],
       cgst: 0,
       sgst: 0,
       igst: 0,
-      loadingCharges: 0,
-      transportCharges: 0,
+      loadingCharges: '',
+      transportCharges: '',
       subtotal: 0,
       totalTax: 0,
       totalAmount: 0,
@@ -413,20 +413,20 @@ export default function AdminPage() {
           brand: item.brand || linkedProd?.brand || '',
           availableProductSizes: productSizes,
           availableProductWeights: weights,
-          qty: item.qty,
+          qty: item.qty ?? '',
           unit: item.unit || 'Pcs',
-          rate: item.rate,
-          total: item.total
+          rate: item.rate ?? '',
+          total: item.total || 0
         };
       }),
       cgst: quote.cgst || 0,
       sgst: quote.sgst || 0,
       igst: quote.igst || 0,
-      loadingCharges: quote.loadingCharges || 0,
-      transportCharges: quote.transportCharges || 0,
-      subtotal: quote.subtotal,
-      totalTax: quote.totalTax,
-      totalAmount: quote.totalAmount,
+      loadingCharges: quote.loadingCharges ? quote.loadingCharges : '',
+      transportCharges: quote.transportCharges ? quote.transportCharges : '',
+      subtotal: quote.subtotal || 0,
+      totalTax: quote.totalTax || 0,
+      totalAmount: quote.totalAmount || 0,
       terms: quote.terms || ''
     });
     setIsQuotationFormOpen(true);
@@ -435,6 +435,21 @@ export default function AdminPage() {
   const handleQuotationFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const payload = {
+      ...quotationFormData,
+      validityDays: Number(quotationFormData.validityDays) || 1,
+      loadingCharges: Number(quotationFormData.loadingCharges) || 0,
+      transportCharges: Number(quotationFormData.transportCharges) || 0,
+      subtotal: Number(quotationFormData.subtotal) || 0,
+      totalAmount: Number(quotationFormData.totalAmount) || 0,
+      items: quotationFormData.items.map(it => ({
+        ...it,
+        qty: Number(it.qty) || 1,
+        rate: Number(it.rate) || 0,
+        total: (Number(it.qty) || 1) * (Number(it.rate) || 0)
+      }))
+    };
 
     const url = editingQuotationId ? `/api/quotations/${editingQuotationId}` : '/api/quotations';
     const method = editingQuotationId ? 'PUT' : 'POST';
@@ -446,7 +461,7 @@ export default function AdminPage() {
           'Content-Type': 'application/json',
           'x-admin-password': passcode,
         },
-        body: JSON.stringify(quotationFormData),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
@@ -506,7 +521,7 @@ export default function AdminPage() {
           availableProductWeights: [],
           qty: 1,
           unit: 'Pcs',
-          rate: 0,
+          rate: '',
           total: 0
         }
       ]
@@ -523,8 +538,10 @@ export default function AdminPage() {
 
   const handleQuotationItemChange = (index, field, value) => {
     const updatedItems = [...quotationFormData.items];
-    updatedItems[index][field] = field === 'qty' || field === 'rate' ? Number(value) : value;
-    updatedItems[index].total = Number(updatedItems[index].qty || 0) * Number(updatedItems[index].rate || 0);
+    updatedItems[index][field] = value;
+    const q = parseFloat(updatedItems[index].qty) || 0;
+    const r = parseFloat(updatedItems[index].rate) || 0;
+    updatedItems[index].total = q * r;
     setQuotationFormData(prev => ({
       ...prev,
       items: updatedItems
@@ -572,15 +589,16 @@ export default function AdminPage() {
     const brandDisplay = prod.brand ? ` (${prod.brand})` : '';
     updatedItems[index].name = `${prod.name}${sizeDisplay}${weightDisplay}${brandDisplay}`;
 
-    let estRate = 0;
+    let estRate = '';
     if (prod.price && prod.price !== 'On Request') {
       const match = prod.price.match(/\d+[\d,.]*/);
       if (match) {
         estRate = parseFloat(match[0].replace(/,/g, ''));
       }
     }
-    updatedItems[index].rate = estRate;
-    updatedItems[index].total = estRate * (Number(updatedItems[index].qty) || 1);
+    updatedItems[index].rate = estRate !== '' ? estRate : '';
+    const q = parseFloat(updatedItems[index].qty) || 1;
+    updatedItems[index].total = (parseFloat(estRate) || 0) * q;
 
     setQuotationFormData(prev => ({
       ...prev,
@@ -636,44 +654,33 @@ export default function AdminPage() {
   useEffect(() => {
     if (!isQuotationFormOpen) return;
     
-    const updatedItems = quotationFormData.items.map(item => {
-      const total = Number(item.qty || 0) * Number(item.rate || 0);
-      return { ...item, total };
-    });
+    const subtotal = quotationFormData.items.reduce((acc, item) => {
+      const q = parseFloat(item.qty) || 0;
+      const r = parseFloat(item.rate) || 0;
+      return acc + (q * r);
+    }, 0);
 
-    const subtotal = updatedItems.reduce((acc, item) => acc + item.total, 0);
-
-    const cgstPct = 0;
-    const sgstPct = 0;
-    const igstPct = 0;
-
-    const totalTax = 0;
-
-    const loading = Number(quotationFormData.loadingCharges || 0);
-    const transport = Number(quotationFormData.transportCharges || 0);
-
+    const loading = parseFloat(quotationFormData.loadingCharges) || 0;
+    const transport = parseFloat(quotationFormData.transportCharges) || 0;
     const totalAmount = Math.round(subtotal + loading + transport);
 
     if (
-      JSON.stringify(updatedItems) !== JSON.stringify(quotationFormData.items) ||
       subtotal !== quotationFormData.subtotal ||
-      totalTax !== quotationFormData.totalTax ||
       totalAmount !== quotationFormData.totalAmount
     ) {
       setQuotationFormData(prev => ({
         ...prev,
-        items: updatedItems,
         subtotal,
-        totalTax,
         totalAmount
       }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isQuotationFormOpen,
     quotationFormData.items,
     quotationFormData.loadingCharges,
-    quotationFormData.transportCharges
+    quotationFormData.transportCharges,
+    quotationFormData.subtotal,
+    quotationFormData.totalAmount
   ]);
 
   // PDF Export logic
@@ -695,221 +702,345 @@ export default function AdminPage() {
       const { jsPDF } = await import('jspdf');
       const doc = new jsPDF('p', 'mm', 'a4'); // A4 size: 210 x 297 mm
 
-      const leftMargin = 15;
-      const rightMargin = 195;
-      let currentY = 15;
+      const leftMargin = 14;
+      const rightMargin = 196;
+      const contentWidth = rightMargin - leftMargin; // 182 mm
+      let currentY = 12;
 
-      // Draw Letterhead Header
+      // ==========================================
+      // 1. BRAND HEADER & LETTERHEAD
+      // ==========================================
       if (logoBase64) {
-        doc.addImage(logoBase64, 'JPEG', leftMargin, currentY, 22, 22);
+        doc.addImage(logoBase64, 'JPEG', leftMargin, currentY, 19, 19);
       }
-      
+
+      // Company Title & Tagline
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(22);
+      doc.setFontSize(20);
       doc.setTextColor(15, 23, 42); // slate-900
-      doc.text('UJJWAL IRON', 42, currentY + 6);
+      doc.text('UJJWAL IRON', 36, currentY + 7);
 
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(71, 85, 105); // slate-600
-      doc.text('Dealers in MS Pipes, Tata & Jindal Sheets, HR/CR Sheet, Angles, Flats & Channels', 42, currentY + 11);
-      doc.text('Address: Lalmati Devi House, Ashiyana Digha Road, Digha Ghat, Patna - 800011', 42, currentY + 16);
-      doc.text('Mobile: +91 8986043632 | Email: ujjwalkrsigh356@gmail.com', 42, currentY + 21);
-
-      currentY += 26;
-      doc.setDrawColor(203, 213, 225); // slate-300
-      doc.setLineWidth(0.5);
-      doc.line(leftMargin, currentY, rightMargin, currentY);
-
-      // Title
-      currentY += 10;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.setTextColor(217, 119, 6); // amber-600
-      doc.text('QUOTATION', 105, currentY, { align: 'center' });
-
-      // Customer Info Box vs Quotation Info
-      currentY += 12;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(15, 23, 42); // slate-900
-      doc.text('QUOTATION TO:', leftMargin, currentY);
-      doc.text('QUOTATION DETAILS:', 125, currentY);
-
-      currentY += 5;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text(quote.customerName, leftMargin, currentY);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(51, 65, 85); // slate-700
-      doc.text(`Quotation No: ${quote.quotationNo}`, 125, currentY);
-
-      currentY += 5;
-      doc.text(`Phone: +91 ${quote.phone}`, leftMargin, currentY);
-      doc.text(`Date: ${new Date(quote.date).toLocaleDateString('en-IN')}`, 125, currentY);
-
-      currentY += 5;
-      doc.text(`Validity: ${quote.validityDays} Day(s)`, 125, currentY);
-      if (quote.gstNo) {
-        doc.text(`GSTIN: ${quote.gstNo.toUpperCase()}`, leftMargin, currentY);
-        currentY += 5;
-      }
-      if (quote.address) {
-        doc.text(`Delivery: ${quote.address}`, leftMargin, currentY);
-        currentY += 5;
-      }
-
-      currentY += 5;
-
-      // Draw Items Table Headers
-      doc.setFillColor(241, 245, 249); // slate-100 background
-      doc.rect(leftMargin, currentY, 180, 8, 'F');
-      
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(15, 23, 42); // slate-900
-
-      // columns: S.No, Description, Qty, Unit, Rate, Total
-      doc.text('S.No', leftMargin + 2, currentY + 5.5);
-      doc.text('Material Description', leftMargin + 12, currentY + 5.5);
-      doc.text('Qty', leftMargin + 131, currentY + 5.5, { align: 'right' });
-      doc.text('Unit', leftMargin + 133, currentY + 5.5);
-      doc.text('Rate', leftMargin + 163, currentY + 5.5, { align: 'right' });
-      doc.text('Total (Rs)', rightMargin - 1, currentY + 5.5, { align: 'right' });
-
-      currentY += 8;
-
-      // Table Rows
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(51, 65, 85); // slate-700
-      
-      quote.items.forEach((item, index) => {
-        if (currentY > 240) {
-          doc.addPage();
-          currentY = 20;
-          
-          doc.setFillColor(241, 245, 249);
-          doc.rect(leftMargin, currentY, 180, 8, 'F');
-          doc.setFont('helvetica', 'bold');
-          doc.text('S.No', leftMargin + 2, currentY + 5.5);
-          doc.text('Material Description', leftMargin + 12, currentY + 5.5);
-          doc.text('Qty', leftMargin + 131, currentY + 5.5, { align: 'right' });
-          doc.text('Unit', leftMargin + 133, currentY + 5.5);
-          doc.text('Rate', leftMargin + 163, currentY + 5.5, { align: 'right' });
-          doc.text('Total (Rs)', rightMargin - 1, currentY + 5.5, { align: 'right' });
-          currentY += 8;
-          doc.setFont('helvetica', 'normal');
-        }
-
-        doc.text(String(index + 1), leftMargin + 2, currentY + 5.5);
-        
-        const itemName = item.name.length > 60 ? item.name.substring(0, 58) + '...' : item.name;
-        doc.text(itemName, leftMargin + 12, currentY + 5.5);
-        
-        doc.text(String(item.qty), leftMargin + 131, currentY + 5.5, { align: 'right' });
-        doc.text(item.unit || 'Pcs', leftMargin + 133, currentY + 5.5);
-        doc.text(item.rate.toFixed(2), leftMargin + 163, currentY + 5.5, { align: 'right' });
-        doc.text((item.qty * item.rate).toFixed(2), rightMargin - 1, currentY + 5.5, { align: 'right' });
-
-        doc.setDrawColor(241, 245, 249);
-        doc.line(leftMargin, currentY + 8, rightMargin, currentY + 8);
-
-        currentY += 8;
-      });
-
-      currentY += 5;
-
-      if (currentY > 210) {
-        doc.addPage();
-        currentY = 20;
-      }
-
-      // Bank Details Box on the Left
-      doc.setFillColor(248, 250, 252); // slate-50
-      doc.setDrawColor(226, 232, 240); // slate-200
-      doc.roundedRect(leftMargin, currentY, 95, 27, 2, 2, 'FD');
-
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(15, 23, 42); // slate-900
-      doc.text('Bank Account Details (NEFT / RTGS / IMPS):', leftMargin + 3, currentY + 5);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.8);
-      doc.setTextColor(51, 65, 85); // slate-700
-      doc.text('Bank Name: ICICI Bank', leftMargin + 3, currentY + 9.5);
-      doc.text('Account Name: UJJWAL IRON', leftMargin + 3, currentY + 13.5);
-      doc.text('Account No: 238105500009', leftMargin + 3, currentY + 17.5);
-      doc.text('IFSC Code: ICIC0002381', leftMargin + 3, currentY + 21.5);
-      doc.text('Branch: Patliputra', leftMargin + 3, currentY + 25.5);
-
-      // Cost Calculation Summary on the Right
-      const summaryStartX = 120;
-      let costY = currentY + 2;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(71, 85, 105);
-
-      // Subtotal
-      doc.text('Subtotal:', summaryStartX, costY);
-      doc.text(`Rs. ${quote.subtotal.toFixed(2)}`, rightMargin - 1, costY, { align: 'right' });
-      costY += 5;
-
-      // Loading / Transportation
-      if (quote.loadingCharges > 0) {
-        doc.text('Loading Charges:', summaryStartX, costY);
-        doc.text(`Rs. ${quote.loadingCharges.toFixed(2)}`, rightMargin - 1, costY, { align: 'right' });
-        costY += 5;
-      }
-      if (quote.transportCharges > 0) {
-        doc.text('Transportation:', summaryStartX, costY);
-        doc.text(`Rs. ${quote.transportCharges.toFixed(2)}`, rightMargin - 1, costY, { align: 'right' });
-        costY += 5;
-      }
-
-      doc.setDrawColor(203, 213, 225);
-      doc.line(summaryStartX, costY, rightMargin - 1, costY);
-      costY += 4;
-
-      // Grand Total
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(15, 23, 42); // slate-900
-      doc.text('Grand Total:', summaryStartX, costY);
-      doc.text(`Rs. ${Math.round(quote.totalAmount).toLocaleString('en-IN')}`, rightMargin - 1, costY, { align: 'right' });
-
-      currentY = Math.max(currentY + 31, costY + 8);
-
-      if (currentY > 240) {
-        doc.addPage();
-        currentY = 20;
-      }
-
-      // Terms & Conditions
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.setTextColor(15, 23, 42);
-      doc.text('Terms & Conditions:', leftMargin, currentY);
-      
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
       doc.setTextColor(100, 116, 139); // slate-500
-      
-      const termsLines = quote.terms ? quote.terms.split('\n') : [];
-      let termsY = currentY + 4;
-      termsLines.forEach((line) => {
-        doc.text(line, leftMargin, termsY);
-        termsY += 4;
+      doc.text('Wholesale Stockist: MS Pipes, Tata/Jindal Sheets, HR/CR, Angles & Flats', 36, currentY + 12);
+      doc.text('Authorised Dealer: Tata Structura, Jindal & SAIL', 36, currentY + 16.5);
+
+      // Contact & Address on the Right
+      doc.setFontSize(7.5);
+      doc.setTextColor(71, 85, 105); // slate-600
+      doc.text('Ashiyana Digha Road, Digha Ghat, Patna - 800011', rightMargin, currentY + 6, { align: 'right' });
+      doc.text('Phone: +91 8986043632 | Email: ujjwalkrsigh356@gmail.com', rightMargin, currentY + 10.5, { align: 'right' });
+      doc.text('www.ujjwaliron.com', rightMargin, currentY + 15, { align: 'right' });
+
+      // Amber Brand Divider Bar
+      currentY += 21;
+      doc.setFillColor(217, 119, 6); // amber-600
+      doc.rect(leftMargin, currentY, contentWidth, 1.2, 'F');
+      currentY += 5;
+
+      // ==========================================
+      // 2. QUOTATION TITLE BAR
+      // ==========================================
+      doc.setFillColor(248, 250, 252); // slate-50
+      doc.setDrawColor(226, 232, 240); // slate-200
+      doc.roundedRect(leftMargin, currentY, contentWidth, 8, 1.5, 1.5, 'FD');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(217, 119, 6); // amber-600
+      doc.text('PRICE ESTIMATE / QUOTATION', leftMargin + (contentWidth / 2), currentY + 5.5, { align: 'center' });
+      currentY += 11;
+
+      // ==========================================
+      // 3. TWO CARDS: CUSTOMER INFO & QUOTE META
+      // ==========================================
+      const cardHeight = 27;
+      const leftCardWidth = 98;
+      const rightCardWidth = contentWidth - leftCardWidth - 4; // 80 mm
+      const rightCardX = leftMargin + leftCardWidth + 4; // 116 mm
+
+      // Customer Info Card
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(leftMargin, currentY, leftCardWidth, cardHeight, 2, 2, 'FD');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(217, 119, 6); // amber-600
+      doc.text('QUOTATION TO (ग्राहक विवरण):', leftMargin + 3.5, currentY + 5.5);
+
+      doc.setFontSize(9.5);
+      doc.setTextColor(15, 23, 42); // slate-900
+      const custName = quote.customerName.length > 38 ? quote.customerName.substring(0, 35) + '...' : quote.customerName;
+      doc.text(custName, leftMargin + 3.5, currentY + 11);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text(`Phone: +91 ${quote.phone}`, leftMargin + 3.5, currentY + 16);
+
+      let custExtra = '';
+      if (quote.gstNo) custExtra += `GSTIN: ${quote.gstNo.toUpperCase()}  `;
+      if (quote.address) custExtra += `Site: ${quote.address}`;
+      if (custExtra) {
+        const extraTrimmed = custExtra.length > 50 ? custExtra.substring(0, 47) + '...' : custExtra;
+        doc.text(extraTrimmed, leftMargin + 3.5, currentY + 21);
+      }
+
+      // Quotation Meta Card
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(rightCardX, currentY, rightCardWidth, cardHeight, 2, 2, 'FD');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(217, 119, 6);
+      doc.text('QUOTATION DETAILS:', rightCardX + 3.5, currentY + 5.5);
+
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text(`Quote No: ${quote.quotationNo}`, rightCardX + 3.5, currentY + 11);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      const formattedDate = new Date(quote.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      doc.text(`Date: ${formattedDate}`, rightCardX + 3.5, currentY + 16);
+      doc.text(`Validity: ${quote.validityDays} Day(s) (Subject to Market)`, rightCardX + 3.5, currentY + 21);
+
+      currentY += cardHeight + 4;
+
+      // ==========================================
+      // 4. ITEMS TABLE (CLEAN, SPACIOUS, CONTRAST)
+      // ==========================================
+      const tableHeaderHeight = 8;
+      const colX = {
+        sno: leftMargin + 4,          // x = 18 (center)
+        desc: leftMargin + 10,        // x = 24 (left)
+        qty: leftMargin + 118,        // x = 132 (right)
+        unit: leftMargin + 131,       // x = 145 (center)
+        rate: leftMargin + 158,       // x = 172 (right)
+        total: rightMargin - 3        // x = 193 (right)
+      };
+
+      const drawTableHeader = (yPos) => {
+        doc.setFillColor(15, 23, 42); // slate-900 dark executive header
+        doc.roundedRect(leftMargin, yPos, contentWidth, tableHeaderHeight, 1.5, 1.5, 'F');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(255, 255, 255);
+
+        doc.text('#', colX.sno, yPos + 5.2, { align: 'center' });
+        doc.text('Material Description & Sizes', colX.desc, yPos + 5.2);
+        doc.text('Qty', colX.qty, yPos + 5.2, { align: 'right' });
+        doc.text('Unit', colX.unit, yPos + 5.2, { align: 'center' });
+        doc.text('Rate (Rs)', colX.rate, yPos + 5.2, { align: 'right' });
+        doc.text('Amount (Rs)', colX.total, yPos + 5.2, { align: 'right' });
+      };
+
+      drawTableHeader(currentY);
+      currentY += tableHeaderHeight;
+
+      // Table Rows
+      const rowHeight = 7.8;
+      quote.items.forEach((item, index) => {
+        if (currentY > 235) {
+          doc.addPage();
+          currentY = 15;
+          drawTableHeader(currentY);
+          currentY += tableHeaderHeight;
+        }
+
+        // Alternating row background
+        if (index % 2 === 1) {
+          doc.setFillColor(248, 250, 252); // slate-50
+          doc.rect(leftMargin, currentY, contentWidth, rowHeight, 'F');
+        }
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(String(index + 1), colX.sno, currentY + 5.2, { align: 'center' });
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(15, 23, 42);
+        const nameStr = item.name.length > 56 ? item.name.substring(0, 53) + '...' : item.name;
+        doc.text(nameStr, colX.desc, currentY + 5.2);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(51, 65, 85);
+        doc.text(String(item.qty), colX.qty, currentY + 5.2, { align: 'right' });
+        doc.text(item.unit || 'Pcs', colX.unit, currentY + 5.2, { align: 'center' });
+        doc.text(Number(item.rate).toFixed(2), colX.rate, currentY + 5.2, { align: 'right' });
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(15, 23, 42);
+        doc.text(Number(item.qty * item.rate).toFixed(2), colX.total, currentY + 5.2, { align: 'right' });
+
+        // Subtle row bottom divider
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.3);
+        doc.line(leftMargin, currentY + rowHeight, rightMargin, currentY + rowHeight);
+
+        currentY += rowHeight;
       });
 
-      // Company Header on Right (Authorized Signatory removed as requested)
+      currentY += 4;
+
+      // ==========================================
+      // 5. BANK DETAILS (LEFT) & COST SUMMARY (RIGHT)
+      // ==========================================
+      if (currentY > 195) {
+        doc.addPage();
+        currentY = 15;
+      }
+
+      const bottomSectionHeight = 35;
+      const bankCardWidth = 98;
+      const summaryCardWidth = contentWidth - bankCardWidth - 4; // 80 mm
+      const summaryCardX = leftMargin + bankCardWidth + 4; // 116 mm
+
+      // 5A. Bank Account Details Card (Left)
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(203, 213, 225);
+      doc.roundedRect(leftMargin, currentY, bankCardWidth, bottomSectionHeight, 2, 2, 'FD');
+
+      // Card Header
+      doc.setFillColor(241, 245, 249);
+      doc.roundedRect(leftMargin, currentY, bankCardWidth, 6.5, 2, 2, 'F');
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
+      doc.setFontSize(7.2);
       doc.setTextColor(15, 23, 42);
-      doc.text('For UJJWAL IRON', 150, currentY);
+      doc.text('BANK ACCOUNT DETAILS (RTGS / NEFT / IMPS)', leftMargin + 3.5, currentY + 4.5);
+
+      // Bank Info Key-Values with clean spacing
+      const bankTextX_Key = leftMargin + 3.5;
+      const bankTextX_Val = leftMargin + 26;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text('Bank Name:', bankTextX_Key, currentY + 11.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(15, 23, 42);
+      doc.text('ICICI Bank', bankTextX_Val, currentY + 11.5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text('Account Name:', bankTextX_Key, currentY + 16.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(15, 23, 42);
+      doc.text('UJJWAL IRON', bankTextX_Val, currentY + 16.5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text('Account No:', bankTextX_Key, currentY + 21.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(217, 119, 6);
+      doc.text('238105500009', bankTextX_Val, currentY + 21.5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text('IFSC Code:', bankTextX_Key, currentY + 26.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(15, 23, 42);
+      doc.text('ICIC0002381', bankTextX_Val, currentY + 26.5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text('Branch:', bankTextX_Key, currentY + 31.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(15, 23, 42);
+      doc.text('Patliputra, Patna', bankTextX_Val, currentY + 31.5);
+
+      // 5B. Cost Calculation Summary Card (Right)
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(203, 213, 225);
+      doc.roundedRect(summaryCardX, currentY, summaryCardWidth, bottomSectionHeight, 2, 2, 'FD');
+
+      let summaryLineY = currentY + 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text('Subtotal:', summaryCardX + 3.5, summaryLineY);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(15, 23, 42);
+      doc.text(`Rs. ${quote.subtotal.toFixed(2)}`, rightMargin - 3.5, summaryLineY, { align: 'right' });
+      summaryLineY += 5;
+
+      if (quote.loadingCharges > 0) {
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 116, 139);
+        doc.text('Loading Charges:', summaryCardX + 3.5, summaryLineY);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(15, 23, 42);
+        doc.text(`Rs. ${quote.loadingCharges.toFixed(2)}`, rightMargin - 3.5, summaryLineY, { align: 'right' });
+        summaryLineY += 5;
+      }
+
+      if (quote.transportCharges > 0) {
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 116, 139);
+        doc.text('Transportation:', summaryCardX + 3.5, summaryLineY);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(15, 23, 42);
+        doc.text(`Rs. ${quote.transportCharges.toFixed(2)}`, rightMargin - 3.5, summaryLineY, { align: 'right' });
+        summaryLineY += 5;
+      }
+
+      // Grand Total Highlight Block at Bottom of Summary Card
+      const grandTotalHeight = 11;
+      const grandTotalY = currentY + bottomSectionHeight - grandTotalHeight;
+      doc.setFillColor(15, 23, 42); // slate-900
+      doc.roundedRect(summaryCardX, grandTotalY, summaryCardWidth, grandTotalHeight, 0, 2, 'F');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(255, 255, 255);
+      doc.text('Grand Total:', summaryCardX + 3.5, grandTotalY + 7);
+      doc.setFontSize(10.5);
+      doc.setTextColor(251, 191, 36); // amber-400
+      doc.text(`Rs. ${Math.round(quote.totalAmount).toLocaleString('en-IN')}`, rightMargin - 3.5, grandTotalY + 7, { align: 'right' });
+
+      currentY += bottomSectionHeight + 4;
+
+      // ==========================================
+      // 6. TERMS & CONDITIONS & SIGN-OFF
+      // ==========================================
+      if (currentY > 245) {
+        doc.addPage();
+        currentY = 15;
+      }
+
+      // Terms & Conditions (Left)
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text('TERMS & CONDITIONS:', leftMargin, currentY + 3);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.8);
+      doc.setTextColor(100, 116, 139);
+
+      const termsLines = quote.terms ? quote.terms.split('\n') : [];
+      let termsY = currentY + 6.5;
+      termsLines.forEach((line) => {
+        doc.text(line, leftMargin, termsY);
+        termsY += 3.4;
+      });
+
+      // Company Sign-Off (Right)
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text('For UJJWAL IRON', rightMargin, currentY + 3, { align: 'right' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.text('Authorised Wholesale Partner', rightMargin, currentY + 7, { align: 'right' });
 
       const filename = `${quote.quotationNo}_${quote.customerName.replace(/\s+/g, '_')}.pdf`;
       doc.save(filename);
@@ -2363,9 +2494,10 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           type="number"
                           required
                           min="1"
-                          value={quotationFormData.validityDays}
-                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, validityDays: Number(e.target.value) }))}
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none"
+                          placeholder="1"
+                          value={quotationFormData.validityDays ?? ''}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, validityDays: e.target.value }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-amber-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
                     </div>
@@ -2515,9 +2647,10 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 required
                                 min="0.001"
                                 step="any"
-                                value={item.qty}
+                                placeholder="Qty"
+                                value={item.qty ?? ''}
                                 onChange={(e) => handleQuotationItemChange(index, 'qty', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none text-right font-mono font-bold"
+                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none text-right font-mono font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
                             </div>
 
@@ -2528,9 +2661,10 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                                 required
                                 min="0"
                                 step="any"
-                                value={item.rate}
+                                placeholder="0.00"
+                                value={item.rate ?? ''}
                                 onChange={(e) => handleQuotationItemChange(index, 'rate', e.target.value)}
-                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none text-right font-mono font-bold"
+                                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none text-right font-mono font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
                             </div>
 
@@ -2558,9 +2692,9 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                     </div>
                   </div>
 
-                                    {/* Part 3: Financial Calculations & Logistics */}
+                  {/* Part 3: Financial Calculations & Logistics */}
                   <div className="bg-slate-50/50 dark:bg-slate-950/20 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-550">Logistics & Charges</h4>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-500">Logistics & Charges</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Loading Charges (₹)</label>
@@ -2568,9 +2702,10 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           type="number"
                           min="0"
                           step="any"
-                          value={quotationFormData.loadingCharges}
-                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, loadingCharges: Number(e.target.value) }))}
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                          placeholder="0.00"
+                          value={quotationFormData.loadingCharges ?? ''}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, loadingCharges: e.target.value }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
 
@@ -2580,9 +2715,10 @@ We would like to share the latest wholesale rates and specifications. Let us kno
                           type="number"
                           min="0"
                           step="any"
-                          value={quotationFormData.transportCharges}
-                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, transportCharges: Number(e.target.value) }))}
-                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none"
+                          placeholder="0.00"
+                          value={quotationFormData.transportCharges ?? ''}
+                          onChange={(e) => setQuotationFormData(prev => ({ ...prev, transportCharges: e.target.value }))}
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 font-mono text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
                     </div>
